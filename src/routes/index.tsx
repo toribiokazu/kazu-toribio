@@ -276,8 +276,11 @@ function Portfolio() {
               Hi, I'm Kazu — an AI Automation Innovation Specialist with 5+ years of experience in CRM management, campaign execution, and process automation.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#works" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition" style={{ boxShadow: "var(--shadow-glow)" }}>
-                View my work <ArrowRight className="h-4 w-4" />
+              <a href="https://calendly.com/toribiokazu/discovery-call" target="_blank" rel="noreferrer" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition" style={{ boxShadow: "var(--shadow-glow)" }}>
+                Book a discovery call <ArrowRight className="h-4 w-4" />
+              </a>
+              <a href="#works" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
+                View my work
               </a>
               <a href="#contact" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
                 Get in touch
