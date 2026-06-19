@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
     links: [
     {
       rel: "icon",
-      href: "/favicon.png",
+      href: "/favicon.ico",
     },
   ],
     meta: [
