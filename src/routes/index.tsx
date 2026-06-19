@@ -285,17 +285,26 @@ function Portfolio() {
             </div>
           </div>
 
-          <div className="reveal relative mx-auto">
-            <div className="absolute -inset-6 rounded-[2rem] opacity-60 blur-2xl" style={{ background: "var(--gradient-amber)" }} />
-            <div className="relative animate-float">
-              <div className="rounded-[2rem] p-1.5" style={{ background: "var(--gradient-amber)" }}>
+          <div className="reveal relative mx-auto perspective-[1200px]">
+            {/* Color splash layers behind photo */}
+            <div className="absolute -inset-10 rounded-[3rem] blur-3xl opacity-50 pointer-events-none"
+              style={{ background: "radial-gradient(circle at 30% 30%, oklch(0.75 0.20 55), transparent 60%), radial-gradient(circle at 70% 70%, oklch(0.70 0.18 30), transparent 60%)" }} />
+            <div className="absolute -inset-4 rounded-[2.5rem] blur-2xl opacity-40 pointer-events-none rotate-6"
+              style={{ background: "linear-gradient(135deg, oklch(0.78 0.17 65), oklch(0.68 0.18 35))" }} />
+
+            <div className="relative animate-float group">
+              {/* 3D tilted frame */}
+              <div className="rounded-[2rem] p-1.5 transition-transform duration-500 ease-out group-hover:[transform:rotateY(-6deg)_rotateX(4deg)]"
+                style={{ background: "var(--gradient-amber)", transformStyle: "preserve-3d" }}>
                 <img
-                  src={kazuPhoto.url}
+                  src={kazuHero.url}
                   alt="Kazu Toribio"
                   className="block w-[280px] sm:w-[340px] rounded-[1.6rem] object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -left-4 rounded-2xl bg-card border border-border px-4 py-3 shadow-lg">
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -left-4 rounded-2xl bg-card border border-border px-4 py-3 shadow-lg [transform:translateZ(30px)]"
+                style={{ transformStyle: "preserve-3d" }}>
                 <div className="text-xs text-muted-foreground">Specialist</div>
                 <div className="text-sm font-semibold">AI Automation</div>
               </div>
