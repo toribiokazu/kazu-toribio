@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Mail, Phone, MapPin, Sparkles, Workflow, Megaphone, Database,
   Globe, PenTool, ArrowRight, Quote, Award, Briefcase, ExternalLink,
-  Github, Linkedin, Sun, Moon,
+  Github, Linkedin, Sun, Moon, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import kazuPhoto from "@/assets/kazu-profile.png.asset.json";
 
