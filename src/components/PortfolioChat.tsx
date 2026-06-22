@@ -4,11 +4,17 @@ import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Calendar } from "lucide-react";
 import Avatar3D from "@/components/Avatar3D";
 
-const SUGGESTIONS = [
-  "Give me a summary of Kazu",
-  "What services does Kazu offer?",
-  "Show me his recent projects",
-  "Book a discovery call",
+const BOOKING_URL = "https://calendly.com/toribiokazu/discovery-call";
+
+type Suggestion =
+  | { label: string; action: "send"; prompt: string }
+  | { label: string; action: "book" };
+
+const SUGGESTIONS: Suggestion[] = [
+  { label: "Give me a summary of Kazu", action: "send", prompt: "Give me a concise summary of Kazu — who he is, his background, and what makes him stand out." },
+  { label: "What services does Kazu offer?", action: "send", prompt: "What services does Kazu offer? List them with a short description of each." },
+  { label: "Show me his recent projects", action: "send", prompt: "Show me Kazu's recent projects with a brief highlight of each one." },
+  { label: "Book a discovery call", action: "book" },
 ];
 
 export default function PortfolioChat() {
