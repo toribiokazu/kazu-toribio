@@ -159,7 +159,7 @@ export default function PortfolioChat() {
                       : "bg-muted text-foreground rounded-tl-sm"
                   }`}
                 >
-                  {renderText(m)}
+                  {renderMessage(m)}
                 </div>
               </div>
             ))}
