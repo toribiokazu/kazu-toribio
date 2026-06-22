@@ -111,11 +111,17 @@ export default function PortfolioChat() {
                 <div className="flex flex-wrap gap-2">
                   {SUGGESTIONS.map((s) => (
                     <button
-                      key={s}
-                      onClick={() => send(s)}
+                      key={s.label}
+                      onClick={() => {
+                        if (s.action === "book") {
+                          window.open(BOOKING_URL, "_blank", "noopener,noreferrer");
+                        } else {
+                          send(s.prompt);
+                        }
+                      }}
                       className="text-xs rounded-full border border-border bg-background px-3 py-1.5 hover:border-primary/50 hover:text-foreground transition"
                     >
-                      {s}
+                      {s.label}
                     </button>
                   ))}
                 </div>
