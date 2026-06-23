@@ -45,21 +45,43 @@ export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { messages } = (await request.json()) as { messages?: UIMessage[] };
-        if (!Array.isArray(messages)) {
-          return new Response("Messages are required", { status: 400 });
+        try {
+          const { messages } = (await request.json()) as { messages?: UIMessage[] };
+          if (!Array.isArray(messages)) {
+            return new Response("Messages are required", { status: 400 });
+          }
+
+          // Server-only secret. Never expose via VITE_*. Read inside handler
+          // so Vercel/Workers per-request env injection works.
+          const key = process.env.LOVABLE_API_KEY;
+          if (!key) {
+            console.error(
+              "[/api/chat] Missing LOVABLE_API_KEY env var. " +
+                "Add it in Vercel → Settings → Environment Variables → Production " +
+                "(and Preview if you want preview deployments to work).",
+            );
+            return new Response(
+              "Server configuration error: missing LOVABLE_API_KEY. " +
+                "Add it in Vercel → Settings → Environment Variables → Production.",
+              { status: 500 },
+            );
+          }
+
+          const gateway = createLovableAiGatewayProvider(key);
+          const result = streamText({
+            model: gateway("google/gemini-3-flash-preview"),
+            system: SYSTEM_PROMPT,
+            messages: await convertToModelMessages(messages),
+            onError: ({ error }) => {
+              console.error("[/api/chat] streamText error:", error);
+            },
+          });
+
+          return result.toUIMessageStreamResponse({ originalMessages: messages });
+        } catch (err) {
+          console.error("[/api/chat] Unhandled error:", err);
+          return new Response("Chat endpoint failed. Check server logs.", { status: 500 });
         }
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
-
-        const gateway = createLovableAiGatewayProvider(key);
-        const result = streamText({
-          model: gateway("google/gemini-3-flash-preview"),
-          system: SYSTEM_PROMPT,
-          messages: await convertToModelMessages(messages),
-        });
-
-        return result.toUIMessageStreamResponse({ originalMessages: messages });
       },
     },
   },
