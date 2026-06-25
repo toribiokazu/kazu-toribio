@@ -6,6 +6,8 @@ import {
   Github, Linkedin, Sun, Moon, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import PortfolioChat from "@/components/PortfolioChat";
+import aiLeadRoutingImg from "@/assets/ai-lead-routing.png.asset.json";
+import xeroAsanaImg from "@/assets/xero-asana.png.asset.json";
 
 
 export const Route = createFileRoute("/")({
@@ -73,11 +75,29 @@ const experience = [
   },
 ];
 
-const works = [
-  { title: "AI Lead Routing Workflow", tag: "n8n · GoHighLevel", desc: "Automated qualification and assignment of inbound leads, cutting response time by 80%." },
+const works: {
+  title: string;
+  tag: string;
+  desc: string;
+  image?: string;
+  url?: string;
+}[] = [
+  {
+    title: "AI Lead Routing Workflow",
+    tag: "n8n · GoHighLevel · Groq AI",
+    desc: "Webhook-driven n8n workflow that qualifies inbound GHL leads with AI, tags them hot/warm/cold, creates opportunities and tasks, and pings Slack — cutting response time by 80%.",
+    image: aiLeadRoutingImg.url,
+    url: "https://github.com/toribiokazu/ai-lead-routing-ghl",
+  },
+  {
+    title: "Xero → Asana Transaction Export",
+    tag: "Make.com · Xero · Asana · Google Sheets",
+    desc: "Make.com scenario that exports Xero account transactions to a CSV via Google Sheets and uploads it back to the originating Asana task as an attachment when marked complete.",
+    image: xeroAsanaImg.url,
+    url: "https://github.com/toribiokazu/xero-asana-transaction-export-automation",
+  },
   { title: "Email Nurture System", tag: "Mailchimp · Airtable", desc: "Multi-touch nurture sequences with audience segmentation and dynamic content." },
   { title: "WordPress Product Site", tag: "WordPress · SEO", desc: "Redesigned product website with optimized landing pages and CRM-connected forms." },
-  { title: "Social Campaign Suite", tag: "Canva · Meta Ads", desc: "Full set of branded creatives, flyers, and ad assets for a monthly campaign rollout." },
   { title: "CRM Migration & Cleanup", tag: "Zoho · GoHighLevel", desc: "Migrated 10k+ contacts, restructured pipelines, and trained the team on new workflows." },
   { title: "AI Content Pipeline", tag: "ChatGPT · Make", desc: "End-to-end content generation, review, and publishing pipeline with human-in-the-loop." },
 ];
@@ -406,20 +426,53 @@ function Portfolio() {
       <section id="works" className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeader eyebrow="Previous Works" title="Selected projects & systems" />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {works.map((w, i) => (
-            <article key={w.title} onMouseDown={addRipple} className="reveal ripple card-elevated group rounded-2xl overflow-hidden cursor-pointer">
-              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: `linear-gradient(135deg, oklch(0.${75+i} 0.${12+i} ${40+i*40}), oklch(0.85 0.08 ${260-i*30}))` }}>
-                <div className="absolute inset-0 grid place-items-center font-display text-6xl font-bold text-foreground/15">
-                  {String(i + 1).padStart(2, "0")}
+          {works.map((w, i) => {
+            const cardInner = (
+              <>
+                <div
+                  className="relative aspect-[4/3] overflow-hidden"
+                  style={
+                    w.image
+                      ? { background: "oklch(0.18 0.02 260)" }
+                      : { background: `linear-gradient(135deg, oklch(0.${75+i} 0.${12+i} ${40+i*40}), oklch(0.85 0.08 ${260-i*30}))` }
+                  }
+                >
+                  {w.image ? (
+                    <img
+                      src={w.image}
+                      alt={`${w.title} workflow preview`}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 grid place-items-center font-display text-6xl font-bold text-foreground/15">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="p-6">
-                <div className="text-xs font-medium text-primary">{w.tag}</div>
-                <h3 className="mt-2 text-lg font-semibold">{w.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{w.desc}</p>
-              </div>
-            </article>
-          ))}
+                <div className="p-6">
+                  <div className="text-xs font-medium text-primary">{w.tag}</div>
+                  <h3 className="mt-2 text-lg font-semibold">{w.title}</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">{w.desc}</p>
+                  {w.url && (
+                    <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      <Github className="h-3.5 w-3.5" /> View on GitHub <ArrowRight className="h-3 w-3" />
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+            const className = "reveal ripple card-elevated group rounded-2xl overflow-hidden cursor-pointer block";
+            return w.url ? (
+              <a key={w.title} href={w.url} target="_blank" rel="noreferrer" onMouseDown={addRipple} className={className}>
+                {cardInner}
+              </a>
+            ) : (
+              <article key={w.title} onMouseDown={addRipple} className={className}>
+                {cardInner}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -455,17 +508,8 @@ function Portfolio() {
             </a>
           </div>
 
-          <form className="reveal card-elevated rounded-2xl p-6 space-y-4" onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:toribiokazu@gmail.com`; }}>
-            <Field label="Name" type="text" placeholder="Your name" />
-            <Field label="Email" type="email" placeholder="you@email.com" />
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Message</label>
-              <textarea rows={5} className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Tell me about your project..." />
-            </div>
-            <button type="submit" onMouseDown={addRipple} className="ripple w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition">
-              Send message <ArrowRight className="h-4 w-4" />
-            </button>
-          </form>
+          <ContactForm />
+
         </div>
       </section>
 
@@ -484,6 +528,82 @@ function Portfolio() {
 
       <PortfolioChat />
     </div>
+  );
+}
+
+function ContactForm() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setStatus("error");
+      setErrorMsg("Please fill in all fields.");
+      return;
+    }
+    setStatus("sending");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Failed to send message");
+      }
+      setStatus("success");
+      setName(""); setEmail(""); setMessage("");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
+    }
+  };
+
+  return (
+    <form className="reveal card-elevated rounded-2xl p-6 space-y-4" onSubmit={onSubmit}>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Name</label>
+        <input
+          type="text" value={name} onChange={(e) => setName(e.target.value)}
+          required maxLength={100} placeholder="Your name"
+          className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary transition"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Email</label>
+        <input
+          type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+          required maxLength={255} placeholder="you@email.com"
+          className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary transition"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Message</label>
+        <textarea
+          rows={5} value={message} onChange={(e) => setMessage(e.target.value)}
+          required maxLength={2000} placeholder="Tell me about your project..."
+          className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary transition"
+        />
+      </div>
+      <button
+        type="submit" disabled={status === "sending"}
+        className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition disabled:opacity-60"
+      >
+        {status === "sending" ? "Sending..." : <>Send message <ArrowRight className="h-4 w-4" /></>}
+      </button>
+      {status === "success" && (
+        <p className="text-sm text-green-600 dark:text-green-400">Thanks! Your message has been sent — I'll reply soon.</p>
+      )}
+      {status === "error" && (
+        <p className="text-sm text-red-600 dark:text-red-400">{errorMsg || "Couldn't send your message. Please try again."}</p>
+      )}
+    </form>
   );
 }
 
