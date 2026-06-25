@@ -98,7 +98,7 @@ const works: {
   { 
    title: "Email Nurture System", 
    tag: "Mailchimp · Airtable", 
-   desc: "Multi-touch nurture sequences with audience segmentation and dynamic content.",
+   desc: "A fully automated email nurture system built with n8n, Mailchimp, Airtable, and Slack. The workflow validates contacts, manages subscriber records, tracks engagement, organizes customer lifecycle data, and automatically enrolls leads into personalized email campaigns while providing real-time team notifications.",
    image:"/mailchimp-airtable.png",
    url: "https://github.com/toribiokazu/email-nurture-system",
   },
