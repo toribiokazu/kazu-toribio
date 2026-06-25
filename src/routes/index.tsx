@@ -6,6 +6,8 @@ import {
   Github, Linkedin, Sun, Moon, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import PortfolioChat from "@/components/PortfolioChat";
+import aiLeadRoutingImg from "@/assets/ai-lead-routing.png.asset.json";
+import xeroAsanaImg from "@/assets/xero-asana.png.asset.json";
 
 
 export const Route = createFileRoute("/")({
