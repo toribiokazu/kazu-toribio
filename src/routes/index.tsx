@@ -508,17 +508,8 @@ function Portfolio() {
             </a>
           </div>
 
-          <form className="reveal card-elevated rounded-2xl p-6 space-y-4" onSubmit={(e) => { e.preventDefault(); window.location.href = `mailto:toribiokazu@gmail.com`; }}>
-            <Field label="Name" type="text" placeholder="Your name" />
-            <Field label="Email" type="email" placeholder="you@email.com" />
-            <div>
-              <label className="text-xs font-medium text-muted-foreground">Message</label>
-              <textarea rows={5} className="mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary transition" placeholder="Tell me about your project..." />
-            </div>
-            <button type="submit" onMouseDown={addRipple} className="ripple w-full inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition">
-              Send message <ArrowRight className="h-4 w-4" />
-            </button>
-          </form>
+          <ContactForm />
+
         </div>
       </section>
 
