@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Resend } from "resend";
 import { z } from "zod";
 
 const ContactSchema = z.object({
