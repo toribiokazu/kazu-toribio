@@ -184,3 +184,72 @@
   -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
+
+/* Hero initial-load stagger (above the fold, not scroll-triggered) */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-stagger > * {
+  opacity: 0;
+  animation: hero-in 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: opacity, transform;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 60ms; }
+.hero-stagger > *:nth-child(2) { animation-delay: 150ms; }
+.hero-stagger > *:nth-child(3) { animation-delay: 240ms; }
+.hero-stagger > *:nth-child(4) { animation-delay: 330ms; }
+.hero-stagger > *:nth-child(5) { animation-delay: 420ms; }
+
+/* Subtle hover lift for cards & primary buttons */
+.hover-lift {
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease-out,
+    border-color 180ms ease-out;
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px -20px oklch(0.30 0.05 260 / 0.30);
+}
+.dark .hover-lift:hover {
+  box-shadow: 0 18px 40px -22px oklch(0.05 0.02 260 / 0.85);
+}
+
+/* Nav link underline sweep */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Reduced motion — near-instant, no distraction */
+@media (prefers-reduced-motion: reduce) {
+  .hero-stagger > * {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .reveal {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .hover-lift { transition: none !important; }
+  .hover-lift:hover { transform: none !important; }
+  .nav-link::after { transition: none !important; }
+  .animate-float { animation: none !important; }
+  .marquee-track { animation: none !important; }
+  * { scroll-behavior: auto !important; }
+}

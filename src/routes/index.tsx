@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Mail, Phone, MapPin, Sparkles, Workflow, Megaphone, Database,
   Globe, PenTool, ArrowRight, Quote, Award, Briefcase,
@@ -181,7 +181,7 @@ function ToolsMarquee() {
               return (
                 <div
                   key={`${t.name}-${i}`}
-                  className="flex shrink-0 items-center gap-3 rounded-full border border-border bg-card/60 px-5 py-2.5 text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
+                  className="hover-lift flex shrink-0 items-center gap-3 rounded-full border border-border bg-card/60 px-5 py-2.5 text-muted-foreground transition hover:border-primary/40 hover:text-foreground"
                   title={t.name}
                 >
                   <t.Icon className="h-5 w-5" style={color ? { color } : undefined} />
@@ -336,7 +336,7 @@ function addRipple(e: React.MouseEvent<HTMLElement>) {
 
 function useReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal");
+    const els = document.querySelectorAll<HTMLElement>(".reveal");
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -353,6 +353,70 @@ function useReveal() {
   }, []);
 }
 
+/** Count-up when scrolled into view. Parses "5+", "10k+", "100%" etc. */
+function useCountUp(target: string, duration = 1100) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const [display, setDisplay] = useState(target);
+  const hasRun = useRef(false);
+
+  useEffect(() => {
+    const match = target.match(/^(\d+)(k)?(.*)$/i);
+    if (!match) { setDisplay(target); return; }
+    const base = parseInt(match[1], 10);
+    const isK = !!match[2];
+    const suffix = (isK ? "k" : "") + (match[3] ?? "");
+    const end = base;
+
+    const prefersReduced =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) { setDisplay(target); return; }
+
+    setDisplay("0" + suffix);
+
+    const node = ref.current;
+    if (!node) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || hasRun.current) return;
+        hasRun.current = true;
+        io.disconnect();
+        const start = performance.now();
+        const tick = (now: number) => {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+          const current = Math.round(end * eased);
+          setDisplay(current + suffix);
+          if (t < 1) requestAnimationFrame(tick);
+          else setDisplay(target);
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.4 });
+
+    io.observe(node);
+    return () => io.disconnect();
+  }, [target, duration]);
+
+  return { ref, display };
+}
+
+function StatCard({ k, v, index }: { k: string; v: string; index: number }) {
+  const { ref, display } = useCountUp(k);
+  return (
+    <div
+      className="reveal hover-lift card-elevated rounded-2xl p-5"
+      style={{ transitionDelay: `${Math.min(index, 6) * 60}ms` }}
+    >
+      <div className="font-display text-3xl font-bold text-gradient">
+        <span ref={ref}>{display}</span>
+      </div>
+      <div className="mt-1 text-sm text-muted-foreground">{v}</div>
+    </div>
+  );
+}
+
 function Portfolio() {
   useReveal();
   return (
@@ -366,15 +430,15 @@ function Portfolio() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#services" className="hover:text-foreground transition-colors">Services</a>
-            <a href="#experience" className="hover:text-foreground transition-colors">Experience</a>
-            <a href="#works" className="hover:text-foreground transition-colors">Works</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Testimonials</a>
-            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+            <a href="#services" className="nav-link hover:text-foreground transition-colors">Services</a>
+            <a href="#experience" className="nav-link hover:text-foreground transition-colors">Experience</a>
+            <a href="#works" className="nav-link hover:text-foreground transition-colors">Works</a>
+            <a href="#testimonials" className="nav-link hover:text-foreground transition-colors">Testimonials</a>
+            <a href="#contact" className="nav-link hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <a href="#contact" onMouseDown={addRipple} className="ripple hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
+            <a href="#contact" onMouseDown={addRipple} className="ripple hover-lift hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
               Hire me <ArrowRight className="h-4 w-4" />
             </a>
           </div>
@@ -384,7 +448,7 @@ function Portfolio() {
       {/* HERO */}
       <section className="relative bg-hero-glow overflow-hidden">
         <div className="mx-auto max-w-6xl px-6 pt-20 pb-28 grid gap-12 lg:grid-cols-[1.4fr_1fr] items-center">
-          <div className="reveal">
+          <div className="hero-stagger">
             <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-1.5 text-xs text-muted-foreground">
               <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
               Available for new projects
@@ -396,13 +460,13 @@ function Portfolio() {
               I help businesses automate operations, streamline CRM workflows, and scale marketing systems using AI, n8n, Make, Zapier, and GoHighLevel.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="https://calendly.com/toribiokazu/discovery-call" target="_blank" rel="noreferrer" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition" style={{ boxShadow: "var(--shadow-glow)" }}>
+              <a href="https://calendly.com/toribiokazu/discovery-call" target="_blank" rel="noreferrer" onMouseDown={addRipple} className="ripple hover-lift inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-semibold text-primary-foreground hover:opacity-90 transition" style={{ boxShadow: "var(--shadow-glow)" }}>
                 Book a discovery call <ArrowRight className="h-4 w-4" />
               </a>
-              <a href="#works" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
+              <a href="#works" onMouseDown={addRipple} className="ripple hover-lift inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
                 View my work
               </a>
-              <a href="#contact" onMouseDown={addRipple} className="ripple inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
+              <a href="#contact" onMouseDown={addRipple} className="ripple hover-lift inline-flex items-center gap-2 rounded-full border border-border bg-card px-6 py-3 font-semibold hover:border-primary/50 transition">
                 Get in touch
               </a>
             </div>
@@ -441,11 +505,8 @@ function Portfolio() {
             { k: "50+", v: "Workflows automated" },
             { k: "10k+", v: "Leads managed" },
             { k: "100%", v: "Client satisfaction" },
-          ].map((s) => (
-            <div key={s.v} className="reveal card-elevated rounded-2xl p-5">
-              <div className="font-display text-3xl font-bold text-gradient">{s.k}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{s.v}</div>
-            </div>
+          ].map((s, i) => (
+            <StatCard key={s.v} k={s.k} v={s.v} index={i} />
           ))}
         </div>
       </section>
@@ -459,8 +520,13 @@ function Portfolio() {
       <section id="services" className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeader eyebrow="Services" title="What I can do for you" />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s) => (
-            <div key={s.title} onMouseDown={addRipple} className="reveal ripple card-elevated rounded-2xl p-6 cursor-pointer">
+          {services.map((s, i) => (
+            <div
+              key={s.title}
+              onMouseDown={addRipple}
+              className="reveal ripple hover-lift card-elevated rounded-2xl p-6 cursor-pointer"
+              style={{ transitionDelay: `${Math.min(i, 6) * 60}ms` }}
+            >
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
                 <s.icon className="h-6 w-6" />
               </div>
@@ -613,7 +679,8 @@ function WorksSection() {
             key={w.title}
             onClick={() => setOpenIndex(i)}
             onMouseDown={addRipple}
-            className="reveal ripple card-elevated group rounded-2xl overflow-hidden cursor-pointer block text-left"
+            className="reveal ripple hover-lift card-elevated group rounded-2xl overflow-hidden cursor-pointer block text-left"
+            style={{ transitionDelay: `${Math.min(i, 6) * 60}ms` }}
           >
             <div
               className="relative aspect-[4/3] overflow-hidden"
