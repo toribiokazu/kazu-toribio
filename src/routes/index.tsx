@@ -430,15 +430,15 @@ function Portfolio() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
-            <a href="#services" className="hover:text-foreground transition-colors">Services</a>
-            <a href="#experience" className="hover:text-foreground transition-colors">Experience</a>
-            <a href="#works" className="hover:text-foreground transition-colors">Works</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Testimonials</a>
-            <a href="#contact" className="hover:text-foreground transition-colors">Contact</a>
+            <a href="#services" className="nav-link hover:text-foreground transition-colors">Services</a>
+            <a href="#experience" className="nav-link hover:text-foreground transition-colors">Experience</a>
+            <a href="#works" className="nav-link hover:text-foreground transition-colors">Works</a>
+            <a href="#testimonials" className="nav-link hover:text-foreground transition-colors">Testimonials</a>
+            <a href="#contact" className="nav-link hover:text-foreground transition-colors">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <a href="#contact" onMouseDown={addRipple} className="ripple hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
+            <a href="#contact" onMouseDown={addRipple} className="ripple hover-lift hidden md:inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition">
               Hire me <ArrowRight className="h-4 w-4" />
             </a>
           </div>
