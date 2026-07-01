@@ -5,22 +5,18 @@ import ReactMarkdown from "react-markdown";
 import { MessageCircle, Send, X, Calendar } from "lucide-react";
 import Avatar3D from "@/components/Avatar3D";
 
-const BOOKING_URL = "https://calendly.com/toribiokazu/discovery-call";
-
-type Suggestion =
-  | { label: string; action: "send"; prompt: string }
-  | { label: string; action: "book" };
+type Suggestion = { label: string; prompt: string };
 
 const SUGGESTIONS: Suggestion[] = [
-  { label: "Give me a summary of Kazu", action: "send", prompt: "Give me a concise summary of Kazu — who he is, his background, and what makes him stand out." },
-  { label: "What services does Kazu offer?", action: "send", prompt: "What services does Kazu offer? List them with a short description of each." },
-  { label: "Show me his recent projects", action: "send", prompt: "Show me Kazu's recent projects with a brief highlight of each one." },
-  { label: "Book a discovery call", action: "book" },
+  { label: "Give me a summary of Kazu", prompt: "Give me a concise summary of Kazu — who he is, his background, and what makes him stand out." },
+  { label: "What services does Kazu offer?", prompt: "What services does Kazu offer? List them with a short description of each." },
+  { label: "Show me his recent projects", prompt: "Show me Kazu's recent projects with a brief highlight of each one." },
 ];
 
 export default function PortfolioChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [usedSuggestions, setUsedSuggestions] = useState<Set<string>>(new Set());
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -102,25 +98,26 @@ export default function PortfolioChat() {
     return out.join("\n");
   };
 
-  const renderSuggestions = () => (
-    <div className="flex flex-wrap gap-2">
-      {SUGGESTIONS.map((s) => (
-        <button
-          key={s.label}
-          onClick={() => {
-            if (s.action === "book") {
-              window.open(BOOKING_URL, "_blank", "noopener,noreferrer");
-            } else {
+  const renderSuggestions = () => {
+    const remaining = SUGGESTIONS.filter((s) => !usedSuggestions.has(s.label));
+    if (remaining.length === 0) return null;
+    return (
+      <div className="flex flex-wrap gap-2">
+        {remaining.map((s) => (
+          <button
+            key={s.label}
+            onClick={() => {
+              setUsedSuggestions((prev) => new Set(prev).add(s.label));
               send(s.prompt);
-            }
-          }}
-          className="text-xs rounded-full border border-border bg-background px-3 py-1.5 hover:border-primary/50 hover:text-foreground transition"
-        >
-          {s.label}
-        </button>
-      ))}
-    </div>
-  );
+            }}
+            className="text-xs rounded-full border border-border bg-background px-3 py-1.5 hover:border-primary/50 hover:text-foreground transition"
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   const renderMessage = (m: UIMessage) => {
     const text = getText(m);
@@ -240,9 +237,12 @@ export default function PortfolioChat() {
               </div>
             )}
 
-            {!isLoading && messages.length > 0 && messages[messages.length - 1]?.role === "assistant" && (
-              <div className="pt-1">{renderSuggestions()}</div>
-            )}
+            {!isLoading &&
+              messages.length > 0 &&
+              messages[messages.length - 1]?.role === "assistant" &&
+              usedSuggestions.size < SUGGESTIONS.length && (
+                <div className="pt-1">{renderSuggestions()}</div>
+              )}
           </div>
 
           {/* Quick action */}
