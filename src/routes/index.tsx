@@ -520,8 +520,13 @@ function Portfolio() {
       <section id="services" className="mx-auto max-w-6xl px-6 py-24">
         <SectionHeader eyebrow="Services" title="What I can do for you" />
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((s) => (
-            <div key={s.title} onMouseDown={addRipple} className="reveal ripple card-elevated rounded-2xl p-6 cursor-pointer">
+          {services.map((s, i) => (
+            <div
+              key={s.title}
+              onMouseDown={addRipple}
+              className="reveal ripple hover-lift card-elevated rounded-2xl p-6 cursor-pointer"
+              style={{ transitionDelay: `${Math.min(i, 6) * 60}ms` }}
+            >
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
                 <s.icon className="h-6 w-6" />
               </div>
