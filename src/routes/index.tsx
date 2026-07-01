@@ -505,11 +505,8 @@ function Portfolio() {
             { k: "50+", v: "Workflows automated" },
             { k: "10k+", v: "Leads managed" },
             { k: "100%", v: "Client satisfaction" },
-          ].map((s) => (
-            <div key={s.v} className="reveal card-elevated rounded-2xl p-5">
-              <div className="font-display text-3xl font-bold text-gradient">{s.k}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{s.v}</div>
-            </div>
+          ].map((s, i) => (
+            <StatCard key={s.v} k={s.k} v={s.v} index={i} />
           ))}
         </div>
       </section>
