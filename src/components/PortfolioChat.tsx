@@ -6,6 +6,8 @@ import { MessageCircle, Send, X, Calendar } from "lucide-react";
 import Avatar3D from "@/components/Avatar3D";
 import { openCalendlyPopup } from "@/lib/calendly";
 
+const BOOK_CALL_MARKER = "[[BOOK_CALL]]";
+
 type Suggestion = { label: string; prompt: string };
 
 const SUGGESTIONS: Suggestion[] = [
@@ -125,6 +127,8 @@ export default function PortfolioChat() {
     if (m.role === "user") {
       return <span className="whitespace-pre-wrap">{text}</span>;
     }
+    const showBookButton = text.includes(BOOK_CALL_MARKER);
+    const cleanText = text.split(BOOK_CALL_MARKER).join("").trim();
     return (
       <div className="max-w-none leading-relaxed">
         <ReactMarkdown
@@ -140,8 +144,17 @@ export default function PortfolioChat() {
             ),
           }}
         >
-          {normalizeForMarkdown(text)}
+          {normalizeForMarkdown(cleanText)}
         </ReactMarkdown>
+        {showBookButton && (
+          <button
+            type="button"
+            onClick={openCalendlyPopup}
+            className="mt-1 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition"
+          >
+            <Calendar className="h-3.5 w-3.5" /> Book a discovery call
+          </button>
+        )}
       </div>
     );
   };
