@@ -25,9 +25,14 @@ class StrategyConfig:
     rsi_short_min: float = 30.0  # don't sell into oversold
     stop_atr_buffer: float = 0.5  # stop = pattern extreme -/+ this * ATR
     max_stop_atr_mult: float = 3.0  # skip setups with absurdly wide stops
-    breakeven_at_r: float = 1.5  # move stop to entry at +1.5R
-    trail_atr_mult: float = 4.5  # wide chandelier trail: let winners run
-    target_r: float | None = None  # optional hard take-profit in R (None = trail only)
+    # --- exits: tuned for a >=50% win rate ---
+    # Most of the position is banked at +partial_take_r (locking a winning
+    # trade), the stop jumps to breakeven, and the small remainder trails.
+    partial_take_r: float | None = 1.0  # scale-out level in R (None = off)
+    partial_take_fraction: float = 0.7  # fraction of the position banked there
+    breakeven_at_r: float = 1.0  # move stop to entry at this R
+    trail_atr_mult: float = 3.0  # chandelier trail (used when target_r is None)
+    target_r: float | None = 2.0  # runner take-profit in R
     allow_shorts: bool = False  # spot demo accounts are long-only
     cooldown_bars: int = 3  # bars to wait after closing a trade
 
@@ -74,6 +79,13 @@ class BotConfig:
         s = self.strategy
         if s.ema_fast >= s.ema_slow:
             raise ValueError("ema_fast must be shorter than ema_slow")
+        if s.partial_take_r is not None:
+            if not (0 < s.partial_take_fraction < 1):
+                raise ValueError("partial_take_fraction must be in (0, 1)")
+            if s.partial_take_r <= 0:
+                raise ValueError("partial_take_r must be positive")
+            if s.target_r is not None and s.target_r <= s.partial_take_r:
+                raise ValueError("target_r must be beyond partial_take_r")
 
 
 def _apply(section_cls, data: dict):

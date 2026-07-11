@@ -85,6 +85,8 @@ class LiveTrader:
                         {
                             "id": p.id, "direction": p.direction, "qty": p.qty,
                             "entry": p.entry, "stop": p.stop, "reason": p.reason,
+                            "partial_done": p.partial_done,
+                            "realized_pnl": p.realized_pnl,
                         }
                         for p in self.broker.positions.values()
                     ],
@@ -118,16 +120,43 @@ class LiveTrader:
         if self.mode == "demo":
             self.broker.refresh(self.cfg.exchange.symbol)
 
-        # 1) manage open positions: stop hits and trailing
+        # 1) manage open positions: stop, scale-out, runner target, trailing
+        scfg = self.cfg.strategy
+        bar_high = float(data["high"].iat[i])
+        bar_low = float(data["low"].iat[i])
         for pos in list(self.broker.positions.values()):
-            hit = (pos.direction > 0 and float(data["low"].iat[i]) <= pos.stop) or (
-                pos.direction < 0 and float(data["high"].iat[i]) >= pos.stop
+            hit = (pos.direction > 0 and bar_low <= pos.stop) or (
+                pos.direction < 0 and bar_high >= pos.stop
             )
             if hit:
                 self.broker.close_position(pos.id, price)
                 self.risk.release_position(pos.id)
                 log.info("Stop hit -> closed %s", pos.id)
                 continue
+
+            r_dist = abs(pos.entry - pos.initial_stop)
+            favourable = bar_high if pos.direction > 0 else bar_low
+
+            if scfg.partial_take_r and not pos.partial_done:
+                level = pos.entry + pos.direction * scfg.partial_take_r * r_dist
+                reached = favourable >= level if pos.direction > 0 else favourable <= level
+                if reached:
+                    self.broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, price)
+                    pos.partial_done = True
+                    pos.stop = max(pos.stop, pos.entry) if pos.direction > 0 else min(pos.stop, pos.entry)
+                    self.risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, pos.direction)
+                    log.info("Banked %.0f%% of %s at +%.1fR; stop -> breakeven",
+                             scfg.partial_take_fraction * 100, pos.id, scfg.partial_take_r)
+
+            if scfg.target_r:
+                target = pos.entry + pos.direction * scfg.target_r * r_dist
+                reached = favourable >= target if pos.direction > 0 else favourable <= target
+                if reached:
+                    self.broker.close_position(pos.id, price)
+                    self.risk.release_position(pos.id)
+                    log.info("Runner target +%.1fR hit -> closed %s", scfg.target_r, pos.id)
+                    continue
+
             pos.best_price = (
                 max(pos.best_price, price) if pos.direction > 0 else min(pos.best_price, price)
             )

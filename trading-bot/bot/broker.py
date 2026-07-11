@@ -27,6 +27,8 @@ class Position:
     risk_amount: float
     opened_at: object = None
     reason: str = ""
+    partial_done: bool = False
+    realized_pnl: float = 0.0  # banked by partial exits before the final close
 
 
 @dataclass
@@ -82,6 +84,24 @@ class PaperBroker:
         )
         self.positions[pos.id] = pos
         return pos
+
+    def close_partial(self, pos_id: str, qty: float, price: float) -> Fill:
+        """Sell/cover part of a position; returns the fill for that slice."""
+        pos = self.positions[pos_id]
+        qty = min(qty, pos.qty)
+        fill_price = price * (1 - self.slip_pct * pos.direction)
+        notional = qty * fill_price
+        fee = notional * self.fee_pct
+        if pos.direction > 0:
+            self.cash += notional - fee
+            pnl = (fill_price - pos.entry) * qty - fee
+        else:
+            entry_notional = qty * pos.entry
+            pnl = (pos.entry - fill_price) * qty - fee
+            self.cash += entry_notional + (entry_notional - notional) - fee
+        pos.qty -= qty
+        pos.realized_pnl += pnl
+        return Fill(price=fill_price, qty=qty, fee=fee)
 
     def close_position(self, pos_id: str, price: float) -> Fill:
         pos = self.positions.pop(pos_id)
@@ -156,6 +176,19 @@ class CcxtBroker:
         self.positions[pos.id] = pos
         log.info("OPENED %s %s qty=%s @ %.2f stop=%.2f (%s)", symbol, "LONG", amount, fill_price, stop, reason)
         return pos
+
+    def close_partial(self, pos_id: str, qty: float, price: float) -> Fill:
+        pos = self.positions[pos_id]
+        amount = float(self.ex.amount_to_precision(pos.symbol, min(qty, pos.qty)))
+        if amount <= 0:
+            return Fill(price=price, qty=0.0, fee=0.0)
+        order = self.ex.create_market_sell_order(pos.symbol, amount)
+        fill_price = float(order.get("average") or order.get("price") or price)
+        pos.qty -= amount
+        pos.realized_pnl += (fill_price - pos.entry) * amount
+        pos.partial_done = True
+        log.info("PARTIAL close %s qty=%s @ %.2f (banked %.2f)", pos.symbol, amount, fill_price, pos.realized_pnl)
+        return Fill(price=fill_price, qty=amount, fee=0.0)
 
     def close_position(self, pos_id: str, price: float) -> Fill:
         pos = self.positions.pop(pos_id)

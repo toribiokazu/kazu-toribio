@@ -6,9 +6,10 @@ A crypto trading bot built around two ideas:
    support/EMA value zones, and only when a reversal candlestick pattern
    (engulfing, hammer/pin bar, momentum close) confirms.
 2. **Risk management first** — profitability comes from asymmetry, not from
-   predicting every move. Losers are cut at a fixed small loss; winners are
-   trailed with a wide ATR stop so they can run. A low win rate is fine when
-   the average winner is 3–4x the average loser.
+   predicting every move. Losers are cut at a fixed small loss (-1R); on
+   winners the bot banks 70% of the position at +1R (locking the trade as a
+   win and moving the stop to breakeven) and lets the remaining 30% run to a
+   +2R target. This scale-out profile targets a ~50% win rate.
 
 ## Hard risk rules (enforced in code, not just config)
 
@@ -31,8 +32,8 @@ TREND     EMA(21) vs EMA(55) alignment + swing structure (HH/HL) must agree
 LOCATION  pullback into the fast EMA or a confirmed support zone
 TRIGGER   bullish reversal pattern completes there, RSI not overbought
 STOP      below the pattern low minus 0.5*ATR (wide stops = skipped setup)
-EXIT      breakeven at +1.5R, then a 4.5*ATR trailing stop — no hard target,
-          winners run until the trail catches them
+EXIT      scale-out: bank 70% at +1R and move the stop to breakeven,
+          then the 30% runner exits at +2R
 ```
 
 Shorts are the mirror image and disabled by default (spot demo accounts are
@@ -91,14 +92,19 @@ positions, kill-switch status) in `state.json`.
 
 ## What results to expect
 
-Sample backtests across 8 different simulated market regimes (3000 x 4h
-candles each) with default settings:
+Sample backtests across 10 simulated market regimes (3000 x 4h candles each)
+with default settings:
 
-- Win rate: 18–33% — most trades are small losses or breakevens
-- Winning regimes: +10% to +47% (trends are ridden with the wide trail)
-- Losing regimes (choppy markets): capped at ~-10 to -11% by the kill switch
+- Win rate: ~50% on average (range 31–65% depending on the regime)
+- Winning regimes: up to +20%; losing (choppy) regimes: capped at ~-10 to
+  -11% by the kill switch
+- Blended winner ≈ +1.3R (0.7 x 1R banked + 0.3 x 2R runner) vs -1R losers
 
-That asymmetry — uncapped upside, hard-capped downside — is the entire edge.
+**Know the trade-off you chose:** win rate is bought by capping winners. In
+the same simulations, a full-position +2R target earned MORE overall at only
+a ~36% win rate, and a wide trailing stop earned the most at 18–33%. If you
+ever care more about total PnL than win rate, set `partial_take_r: null` and
+`breakeven_at_r: 99` in config.yaml to get the full-2R profile back.
 
 ## Honest disclaimers
 

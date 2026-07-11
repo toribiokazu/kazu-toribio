@@ -100,14 +100,15 @@ def run_backtest(df: pd.DataFrame, cfg: BotConfig) -> BacktestResult:
         fill = broker.close_position(pos.id, price)
         risk.release_position(pos.id)
         if pos.direction > 0:
-            pnl = (fill.price - pos.entry) * pos.qty - fill.fee
+            pnl = (fill.price - pos.entry) * fill.qty - fill.fee
         else:
-            pnl = (pos.entry - fill.price) * pos.qty - fill.fee
-        r_unit = abs(pos.entry - pos.initial_stop) * pos.qty
+            pnl = (pos.entry - fill.price) * fill.qty - fill.fee
+        pnl += pos.realized_pnl  # profit already banked by partial exits
+        r_unit = pos.risk_amount  # initial dollars at risk
         trades.append(
             TradeRecord(
                 entry_time=pos.opened_at, exit_time=index[i], direction=pos.direction,
-                entry=pos.entry, exit=fill.price, qty=pos.qty, pnl=pnl,
+                entry=pos.entry, exit=fill.price, qty=fill.qty, pnl=pnl,
                 r_multiple=pnl / r_unit if r_unit > 0 else 0.0,
                 reason=pos.reason, exit_reason=exit_reason,
             )
@@ -144,29 +145,45 @@ def run_backtest(df: pd.DataFrame, cfg: BotConfig) -> BacktestResult:
             pending = None
 
         # 2) manage open positions on this bar
+        # Ordering is conservative: stop first, then partial, then target.
         for pos in list(broker.positions.values()):
+            r_dist = abs(pos.entry - pos.initial_stop)
             if pos.direction > 0:
-                target = (
-                    pos.entry + scfg.target_r * (pos.entry - pos.initial_stop)
-                    if scfg.target_r
+                target = pos.entry + scfg.target_r * r_dist if scfg.target_r else None
+                partial_at = (
+                    pos.entry + scfg.partial_take_r * r_dist
+                    if scfg.partial_take_r and not pos.partial_done
                     else None
                 )
                 if lows[i] <= pos.stop:
                     close_at(pos, min(float(opens[i]), pos.stop), i, "stop")
                     continue
+                if partial_at is not None and highs[i] >= partial_at:
+                    px = max(float(opens[i]), partial_at)
+                    broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, px)
+                    pos.partial_done = True
+                    pos.stop = max(pos.stop, pos.entry)  # lock breakeven
+                    risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, 1)
                 if target is not None and highs[i] >= target:
                     close_at(pos, max(float(opens[i]), target), i, "target")
                     continue
                 pos.best_price = max(pos.best_price, float(closes[i]))
             else:
-                target = (
-                    pos.entry - scfg.target_r * (pos.initial_stop - pos.entry)
-                    if scfg.target_r
+                target = pos.entry - scfg.target_r * r_dist if scfg.target_r else None
+                partial_at = (
+                    pos.entry - scfg.partial_take_r * r_dist
+                    if scfg.partial_take_r and not pos.partial_done
                     else None
                 )
                 if highs[i] >= pos.stop:
                     close_at(pos, max(float(opens[i]), pos.stop), i, "stop")
                     continue
+                if partial_at is not None and lows[i] <= partial_at:
+                    px = min(float(opens[i]), partial_at)
+                    broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, px)
+                    pos.partial_done = True
+                    pos.stop = min(pos.stop, pos.entry)
+                    risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, -1)
                 if target is not None and lows[i] <= target:
                     close_at(pos, min(float(opens[i]), target), i, "target")
                     continue
