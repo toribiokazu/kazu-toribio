@@ -157,7 +157,14 @@ class LiveTrader:
                     level = pos.entry + pos.direction * scfg.partial_take_r * r_dist
                     reached = favourable >= level if pos.direction > 0 else favourable <= level
                     if reached:
-                        self.broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, price)
+                        from .backtest import _partial_slice
+
+                        slice_qty = _partial_slice(
+                            pos.qty, scfg.partial_take_fraction, price,
+                            self.cfg.risk.min_order_notional,
+                        )
+                        if slice_qty > 0:
+                            self.broker.close_partial(pos.id, slice_qty, price)
                         pos.partial_done = True
                         pos.stop = max(pos.stop, pos.entry) if pos.direction > 0 else min(pos.stop, pos.entry)
                         self.risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, pos.direction)

@@ -82,6 +82,30 @@ The bot is **demo-first**: `run_live.py --mode demo` refuses to start unless
 The bot logs every decision to `bot.log` and keeps its state (equity, open
 positions, kill-switch status) in `state.json`.
 
+## Starting with $90–100
+
+Use the ready-made small-account profile:
+
+```bash
+python run_live.py --mode demo --config config.small.yaml
+```
+
+Decisions baked into it (see the comments in `config.small.yaml`):
+- **$1 risk per trade** (1%), max **2 concurrent positions** — that's what
+  $100 of unleveraged cash can genuinely fund while keeping every order
+  and partial exit above the exchange's ~$5 minimum order size.
+- The bot still **scans all 12 pairs** and takes the best 2 setups.
+- Dollar risk rails: lose **$3 in a day** → paused until tomorrow; lose
+  **$10 total** → kill switch, manual reset required.
+- Measured in portfolio sims: ~50% win rate, ~0.9 trades/day, small
+  positive expectancy, no kill-switch hits across 5 regime sets.
+
+Be realistic about the goal at this size: with a ~$100 budget the expected
+profit is on the order of **a few dollars a month** — this stage is about
+proving the system works live with capped risk, not about income. If the
+demo (and later a small real run) stays green for months, the same
+percentages scale with the budget.
+
 ## Recommended evaluation process
 
 1. **Backtest** on 2–3 years of real 4h candles (`--fetch --limit 5000`).

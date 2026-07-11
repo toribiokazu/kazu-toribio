@@ -170,6 +170,10 @@ class RiskManager:
             risk_amount = qty * stop_dist
             if risk_amount < self.budget * 0.001:
                 return 0.0, 0.0
+        # Exchanges reject orders below their minimum notional (~$5 on
+        # Binance spot). Undersized trades are skipped, not shrunk.
+        if qty * entry < self.cfg.min_order_notional:
+            return 0.0, 0.0
         return qty, risk_amount
 
     # -------------------------------------------------------------- tracking

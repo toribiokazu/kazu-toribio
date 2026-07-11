@@ -52,6 +52,9 @@ class RiskConfig:
     # is under this multiple of the round-trip cost (fees+slippage both ways);
     # tighter stops than this mathematically cannot be profitable (None = off)
     max_open_positions: int = 6  # one per symbol, at most this many at once
+    min_order_notional: float = 6.0  # exchanges reject orders below ~$5;
+    # trades (and partial exits) smaller than this are skipped — critical
+    # for small accounts
     fee_pct: float = 0.10  # taker fee per side (0.10% = Binance default)
     slippage_pct: float = 0.05
 

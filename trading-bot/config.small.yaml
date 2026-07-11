@@ -1,0 +1,74 @@
+# ============================================================
+# SMALL ACCOUNT PROFILE — tuned for a $90-100 budget.
+# Run with:  python run_live.py --mode demo --config config.small.yaml
+#            python run_backtest.py --synthetic --config config.small.yaml
+#
+# What changes vs the default config and why:
+#  - risk_per_trade_pct 1.0 (= $1/trade): keeps position sizes around
+#    $30-50, so orders AND the 30% partial exits stay above the
+#    exchange's ~$5 minimum order size.
+#  - max_open_positions 2: $100 of cash can genuinely fund ~2 unleveraged
+#    positions; more slots would just be dead config.
+#  - Everything else (12-pair scan, 2h timeframe, cost gate, vol
+#    targeting, daily pause, kill switch) is inherited unchanged: the
+#    bot still WATCHES all 12 pairs and takes the best 2 setups.
+#
+# Dollar translation of the risk rules at a $100 budget:
+#   per trade risk   : $1
+#   daily loss pause : -$3  -> no new trades until tomorrow (UTC)
+#   kill switch      : -$10 -> bot stops entirely, manual reset required
+# ============================================================
+
+exchange:
+  exchange_id: binance
+  testnet: true             # keep true until the demo period is over
+  symbols:
+    - BTC/USDT
+    - ETH/USDT
+    - SOL/USDT
+    - BNB/USDT
+    - XRP/USDT
+    - ADA/USDT
+    - DOGE/USDT
+    - AVAX/USDT
+    - LINK/USDT
+    - DOT/USDT
+    - LTC/USDT
+    - NEAR/USDT
+  timeframe: 2h
+
+risk:
+  allocated_budget: 100
+  risk_per_trade_pct: 1.0
+  max_total_risk_pct: 10
+  max_drawdown_pct: 10
+  daily_loss_pause_pct: 3
+  vol_target_atr_pct: 0.6
+  min_stop_cost_mult: 5
+  min_order_notional: 6
+  max_open_positions: 2
+  fee_pct: 0.10
+  slippage_pct: 0.05
+
+strategy:
+  ema_fast: 21
+  ema_slow: 55
+  atr_period: 14
+  rsi_period: 14
+  swing_left: 3
+  swing_right: 3
+  structure_lookback: 120
+  zone_cluster_atr_mult: 0.5
+  zone_touch_atr_mult: 0.25
+  min_pattern_score: 0.45
+  rsi_long_max: 70
+  rsi_short_min: 30
+  stop_atr_buffer: 0.5
+  max_stop_atr_mult: 3.0
+  partial_take_r: 1.0
+  partial_take_fraction: 0.3
+  breakeven_at_r: 1.0
+  trail_atr_mult: 3.5
+  target_r: null
+  allow_shorts: false
+  cooldown_bars: 3

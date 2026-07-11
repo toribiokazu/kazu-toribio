@@ -89,6 +89,19 @@ class BacktestResult:
         return m
 
 
+def _partial_slice(qty: float, fraction: float, price: float, min_notional: float) -> float:
+    """Size of the scale-out slice, grown to clear the exchange minimum
+    order size if needed (up to half the position); 0 = skip the bank and
+    just protect the whole position at breakeven."""
+    slice_qty = qty * fraction
+    if slice_qty * price >= min_notional:
+        return slice_qty
+    needed = min_notional / price if price > 0 else 0.0
+    if 0 < needed <= qty * 0.5:
+        return needed
+    return 0.0
+
+
 class _SymbolBook:
     """Per-symbol bar arrays plus a positional cursor into the union clock."""
 
@@ -209,7 +222,11 @@ def run_backtest(data: pd.DataFrame | dict[str, pd.DataFrame], cfg: BotConfig) -
                         continue
                     if partial_at is not None and book.high[i] >= partial_at:
                         px = max(float(book.open[i]), partial_at)
-                        broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, px)
+                        slice_qty = _partial_slice(
+                            pos.qty, scfg.partial_take_fraction, px, cfg.risk.min_order_notional
+                        )
+                        if slice_qty > 0:
+                            broker.close_partial(pos.id, slice_qty, px)
                         pos.partial_done = True
                         pos.stop = max(pos.stop, pos.entry)
                         risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, 1)
@@ -229,7 +246,11 @@ def run_backtest(data: pd.DataFrame | dict[str, pd.DataFrame], cfg: BotConfig) -
                         continue
                     if partial_at is not None and book.low[i] <= partial_at:
                         px = min(float(book.open[i]), partial_at)
-                        broker.close_partial(pos.id, pos.qty * scfg.partial_take_fraction, px)
+                        slice_qty = _partial_slice(
+                            pos.qty, scfg.partial_take_fraction, px, cfg.risk.min_order_notional
+                        )
+                        if slice_qty > 0:
+                            broker.close_partial(pos.id, slice_qty, px)
                         pos.partial_done = True
                         pos.stop = min(pos.stop, pos.entry)
                         risk.update_position_risk(pos.id, pos.entry, pos.stop, pos.qty, -1)
