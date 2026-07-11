@@ -95,10 +95,15 @@ Decisions baked into it (see the comments in `config.small.yaml`):
   $100 of unleveraged cash can genuinely fund while keeping every order
   and partial exit above the exchange's ~$5 minimum order size.
 - The bot still **scans all 12 pairs** and takes the best 2 setups.
+- **4h chart, ~3 trades/week, stricter pattern filter (0.60)** — we raced
+  ~6/week (2h), ~3/week (4h) and ~1/week (ultra-selective) head-to-head:
+  3/week nearly doubled the expectancy of 6/week (+1.65% vs +0.98% per
+  30 days) with a milder worst case, because the marginal daily trades
+  were only feeding fees.
 - Dollar risk rails: lose **$3 in a day** → paused until tomorrow; lose
   **$10 total** → kill switch, manual reset required.
-- Measured in portfolio sims: ~50% win rate, ~0.9 trades/day, small
-  positive expectancy, no kill-switch hits across 5 regime sets.
+- Measured in portfolio sims (8 regime sets): ~46% win rate, ~3
+  trades/week, +1.65%/30d mean, worst regime -4.5%, zero kill-switch hits.
 
 Be realistic about the goal at this size: with a ~$100 budget the expected
 profit is on the order of **a few dollars a month** — this stage is about

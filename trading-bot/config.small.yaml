@@ -35,7 +35,9 @@ exchange:
     - DOT/USDT
     - LTC/USDT
     - NEAR/USDT
-  timeframe: 2h
+  timeframe: 4h             # measured best for small accounts: ~3 trades/
+                            # week at nearly double the expectancy of 2h
+                            # (marginal trades were only feeding fees)
 
 risk:
   allocated_budget: 100
@@ -60,7 +62,8 @@ strategy:
   structure_lookback: 120
   zone_cluster_atr_mult: 0.5
   zone_touch_atr_mult: 0.25
-  min_pattern_score: 0.45
+  min_pattern_score: 0.60  # stricter than the default 0.45: with only ~3
+                           # trades/week, every entry must earn its place
   rsi_long_max: 70
   rsi_short_min: 30
   stop_atr_buffer: 0.5
