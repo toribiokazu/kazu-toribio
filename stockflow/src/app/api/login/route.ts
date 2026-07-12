@@ -1,28 +1,42 @@
 import { NextResponse } from "next/server";
-import { gatePassword, safeEqual, SESSION_COOKIE, sessionToken } from "@/lib/session";
+import { getDb } from "@/lib/db";
+import {
+  createSession,
+  destroySession,
+  sessionTokenFromCookie,
+  verifyPassword,
+} from "@/lib/users";
+import { now } from "@/lib/util";
 
 export async function POST(req: Request) {
-  const password = gatePassword();
-  if (!password) {
-    return NextResponse.json({ error: { message: "Password gate is not enabled" } }, { status: 400 });
+  const body = (await req.json().catch(() => ({}))) as { email?: string; password?: string };
+  if (typeof body.email !== "string" || typeof body.password !== "string") {
+    return NextResponse.json({ error: { message: "Email and password are required" } }, { status: 400 });
   }
-  const body = (await req.json().catch(() => ({}))) as { password?: string };
-  if (typeof body.password !== "string" || !safeEqual(body.password, password)) {
-    return NextResponse.json({ error: { message: "Incorrect password" } }, { status: 401 });
+  const db = getDb();
+  const user = db
+    .prepare("SELECT id, password_hash, active FROM users WHERE email = ?")
+    .get(body.email.toLowerCase().trim()) as { id: string; password_hash: string; active: number } | undefined;
+  if (!user || !user.active || !verifyPassword(body.password, user.password_hash)) {
+    return NextResponse.json({ error: { message: "Incorrect email or password" } }, { status: 401 });
   }
+  db.prepare("UPDATE users SET last_login_at = ? WHERE id = ?").run(now(), user.id);
+  const token = createSession(user.id);
   const res = NextResponse.json({ data: { ok: true } });
-  res.cookies.set(SESSION_COOKIE, sessionToken(password), {
+  res.cookies.set("sf_session", token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 14, // two weeks
+    maxAge: 60 * 60 * 24 * 14,
   });
   return res;
 }
 
-/** Log out: clear the session cookie. */
-export async function DELETE() {
+/** Log out: destroy the session server-side and clear the cookie. */
+export async function DELETE(req: Request) {
+  const token = sessionTokenFromCookie(req.headers.get("cookie"));
+  if (token) destroySession(token);
   const res = NextResponse.json({ data: { ok: true } });
-  res.cookies.set(SESSION_COOKIE, "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 });
+  res.cookies.set("sf_session", "", { httpOnly: true, sameSite: "lax", path: "/", maxAge: 0 });
   return res;
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
+import { TopNav } from "@/components/TopNav";
 import { ToastProvider } from "@/components/ui";
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <div className="flex min-h-screen">
             <Sidebar />
-            <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">{children}</main>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <TopNav />
+              <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">{children}</main>
+            </div>
           </div>
         </ToastProvider>
       </body>

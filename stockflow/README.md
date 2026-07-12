@@ -21,9 +21,14 @@ Every single thing the UI does goes through the public REST API (the UI is just 
 - Reports: inventory valuation, reorder report, low-stock dashboard
 - Oversell protection: any operation that would drive stock negative is rejected atomically
 
+**Users & roles**
+- Real accounts with a first-run setup screen that creates the **super admin**; everyone signs in (no anonymous access)
+- Three roles: **super admin** (everything, incl. Users & Roles + data Export), **admin** (exactly the areas the super admin ticks), **user** (fixed day-to-day operations set) — enforced in both the UI and the API
+- **Users & Roles** page (super admin only): add/deactivate users, change roles inline, reset passwords, and choose which areas admins can reach
+- Top nav bar holds the developer menu; **Export** (full JSON snapshot or per-entity CSV) is super-admin only
+
 **Migration & sandboxing**
 - **Import Data** page: upload CSV exports from SOS Inventory (or anything else) for items, customers, and vendors — auto-matched columns, preview, opening stock quantities into a chosen location, duplicate-safe re-runs
-- **Password gate**: set `STOCKFLOW_PASSWORD` and the whole UI + API sits behind a login — safe to hand a sandbox URL to a client
 - Docker image + configs for Railway/Fly/Render/VPS — see `DEPLOY.md`
 
 **Integrations**
@@ -54,7 +59,7 @@ bun run seed
 
 Development mode: `bun run dev`.
 
-Hosting a sandbox for someone else? Set `STOCKFLOW_PASSWORD` to enable the login gate, and read `DEPLOY.md` for hosting options (Railway/Fly/VPS/free tiers) — the app needs a host with a persistent disk.
+The first time you open the app it shows a one-time setup screen to create the super admin account; after that everyone signs in. Hosting a sandbox for someone else? See `DEPLOY.md` for hosting options (Railway/Fly/VPS/free tiers) — the app needs a host with a persistent disk.
 
 The database is a zero-config embedded SQLite file at `data/stockflow.db` (set `STOCKFLOW_DATA_DIR` to relocate it). It is created automatically on first request — there is no migration step. Requires Node 22+ (uses the built-in `node:sqlite`).
 

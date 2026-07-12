@@ -38,6 +38,11 @@ const ENDPOINTS: { method: string; path: string; desc: string }[] = [
   { method: "POST", path: "/api/v1/deliveries/:id/redeliver", desc: "Manually retry any delivery" },
   { method: "POST", path: "/api/v1/api-keys", desc: "Create API keys — { name, scope: 'full' | 'read' }" },
   { method: "POST", path: "/api/v1/import", desc: "Bulk import — { type: items|customers|vendors, rows, location_id? }; skips existing records" },
+  { method: "GET", path: "/api/v1/me", desc: "Current identity and the permission areas it can reach" },
+  { method: "GET", path: "/api/v1/users", desc: "List/create users (super admin) — { name, email, password, role }" },
+  { method: "PATCH", path: "/api/v1/users/:id", desc: "Change name/role/active or reset password (super admin)" },
+  { method: "GET", path: "/api/v1/permissions", desc: "Role → area matrix; PUT { admin: [...] } sets what admins can access" },
+  { method: "GET", path: "/api/v1/export", desc: "Full JSON snapshot, or ?entity=items|invoices|… for a CSV (super admin / full key)" },
 ];
 
 const METHOD_COLORS: Record<string, string> = {
