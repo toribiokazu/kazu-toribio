@@ -26,6 +26,11 @@ Every single thing the UI does goes through the public REST API (the UI is just 
 - **Password gate**: set `STOCKFLOW_PASSWORD` and the whole UI + API sits behind a login — safe to hand a sandbox URL to a client
 - Docker image + configs for Railway/Fly/Render/VPS — see `DEPLOY.md`
 
+**Integrations**
+- Native **Zoho CRM sync** (Settings → Integrations): creating an estimate creates a Deal in your chosen stage ("Estimate Created" by default), winning/declining it moves the Deal to Closed Won/Lost, and invoices sync to Zoho's Invoices module (contacts and products upserted automatically by email/SKU)
+- Full sync log with per-event results and one-click retry of failures
+- Anything else connects through the generic webhooks + REST API (Zapier, n8n, Make, custom code)
+
 **Developer platform**
 - REST API at `/api/v1` — JSON in/out, uniform `{ data }` / `{ error }` envelopes, pagination, search and filters on every list endpoint
 - API keys with `full` or `read`-only scope; SHA-256-hashed at rest, shown once, revocable

@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getDb } from "./db";
+import { syncToZoho } from "./zoho";
 import { id, now } from "./util";
 
 export const EVENT_TYPES = [
@@ -105,6 +106,8 @@ export function emitEvent(
     ).run(deliveryId, hook.id, eventId, type, body, createdAt);
     void attemptDelivery(deliveryId);
   }
+  // Native integrations subscribe to the same event stream as webhooks.
+  void syncToZoho(type, entityType, entityId, payload);
   return eventId;
 }
 

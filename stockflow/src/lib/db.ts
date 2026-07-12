@@ -251,6 +251,37 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS idx_events_created ON events(created_at);
 
+CREATE TABLE IF NOT EXISTS integration_settings (
+  provider TEXT PRIMARY KEY,
+  config TEXT NOT NULL DEFAULT '{}',
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS integration_links (
+  id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  external_module TEXT NOT NULL,
+  external_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  UNIQUE (provider, entity_type, entity_id)
+);
+
+CREATE TABLE IF NOT EXISTS integration_syncs (
+  id TEXT PRIMARY KEY,
+  provider TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  action TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('success','failed','skipped')),
+  detail TEXT NOT NULL DEFAULT '',
+  payload TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_syncs_created ON integration_syncs(created_at);
+
 CREATE TABLE IF NOT EXISTS counters (
   name TEXT PRIMARY KEY,
   value INTEGER NOT NULL

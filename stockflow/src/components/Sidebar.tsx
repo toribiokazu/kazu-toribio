@@ -13,6 +13,7 @@ import {
   KeyRound,
   MapPin,
   Package,
+  PlugZap,
   ScrollText,
   ShoppingCart,
   Truck,
@@ -52,6 +53,7 @@ const SECTIONS: { label: string; links: { href: string; label: string; icon: Rea
     links: [
       { href: "/settings/api-keys", label: "API Keys", icon: KeyRound },
       { href: "/settings/webhooks", label: "Webhooks", icon: Webhook },
+      { href: "/settings/integrations", label: "Integrations", icon: PlugZap },
       { href: "/activity", label: "Event Log", icon: ScrollText },
       { href: "/docs", label: "API Docs", icon: BookOpen },
     ],
