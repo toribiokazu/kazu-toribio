@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { getDb } from "./db";
 import { syncToZoho } from "./zoho";
+import { syncToQuickBooks } from "./qbo";
 import { id, now } from "./util";
 
 export const EVENT_TYPES = [
@@ -108,6 +109,7 @@ export function emitEvent(
   }
   // Native integrations subscribe to the same event stream as webhooks.
   void syncToZoho(type, entityType, entityId, payload);
+  void syncToQuickBooks(type, entityType, entityId, payload);
   return eventId;
 }
 

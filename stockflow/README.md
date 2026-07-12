@@ -28,6 +28,7 @@ Every single thing the UI does goes through the public REST API (the UI is just 
 
 **Integrations**
 - Native **Zoho CRM sync** (Settings → Integrations): creating an estimate creates a Deal in your chosen stage ("Estimate Created" by default), winning/declining it moves the Deal to Closed Won/Lost, and invoices sync to Zoho's Invoices module (contacts and products upserted automatically by email/SKU)
+- Native **QuickBooks Online sync**: estimates sync as QBO Estimates (Pending → Accepted/Rejected as deals close), invoices sync as QBO Invoices, marking one paid records a QBO Payment against it, and voiding voids it — customers and items are created in QuickBooks automatically (matched by name/SKU); rotating refresh tokens are persisted automatically
 - Full sync log with per-event results and one-click retry of failures
 - Anything else connects through the generic webhooks + REST API (Zapier, n8n, Make, custom code)
 
