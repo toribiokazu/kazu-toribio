@@ -1,14 +1,22 @@
 # ============================================================
 # MEXC FUTURES PAPER-TRADING PROFILE — real MEXC perpetual prices,
-# simulated fills, longs AND shorts. NO API keys needed. Run with:
+# simulated fills. NO API keys needed. Run with:
 #
 #   python run_live.py --mode paper --config config.mexc-futures-paper.yaml --state state_mexc_futures.json
 #
-# Same strategy/risk as config.mexc-paper.yaml, with three changes:
+# Same strategy/risk as config.mexc-paper.yaml, with these changes:
 #   * symbols are USDT perpetuals (BTC/USDT:USDT form; FIL has no
 #     perp on MEXC and is dropped)
-#   * allow_shorts: true — the mirrored short setups trade too
 #   * fee_pct 0.02 — MEXC futures taker (verify, promos change)
+#   * regime_sma_bars 180 — longs only above the pair's own 30d SMA
+#
+# LONG-ONLY BY DESIGN after a 3-year walk-forward (Jul 23 - Jul 26):
+# long-only + gate made +52.9% (PF 1.73) and improved EVERY year;
+# every shorts configuration tested did worse — the best (+23.8%)
+# halved the cycle return, and gated shorts got the bot kill-switched
+# in the 2023 chop months before the bull leg. allow_shorts stays a
+# MANUAL switch: flip it only during a confirmed sustained bear, and
+# expect to flip it back — shorts whipsaw to death in chop and bull.
 #
 # KNOW WHAT THIS DOES NOT MODEL: perpetual funding payments
 # (~0.01% per 8h, either direction) and liquidation mechanics.
@@ -74,8 +82,8 @@ strategy:
   trail_atr_mult: 3.5
   trail_tighten_after_r: null
   target_r: null
-  allow_shorts: true
+  allow_shorts: false       # manual bear-regime switch — see header before flipping
   regime_sma_bars: 180      # ~30 days of 4h bars: long only above the pair's
-                            # own 30d SMA, short only below. Whole 150-300
-                            # plateau tested profitable; 180 sits mid-plateau.
+                            # own 30d SMA. Improved every year of the 3y test
+                            # (+52.9% vs +48.8% ungated, PF 1.73 vs 1.57).
   cooldown_bars: 3

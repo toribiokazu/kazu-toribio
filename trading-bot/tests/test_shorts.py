@@ -45,7 +45,9 @@ def test_ccxt_broker_equity_marks_shorts():
 
 def test_futures_paper_profile_loads():
     cfg = load_config("config.mexc-futures-paper.yaml")
-    assert cfg.strategy.allow_shorts is True
+    # long-only by design: every shorts configuration lost the 3-year
+    # walk-forward; allow_shorts is a manual bear-regime switch
+    assert cfg.strategy.allow_shorts is False
     assert cfg.risk.fee_pct == pytest.approx(0.02)
     assert all(s.endswith(":USDT") for s in cfg.exchange.symbol_list)
     assert "FIL/USDT:USDT" not in cfg.exchange.symbol_list  # no perp on MEXC

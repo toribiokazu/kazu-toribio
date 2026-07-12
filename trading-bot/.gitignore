@@ -1,6 +1,7 @@
 .env
 .venv/
 state*.json
+lt_trades_*.csv
 bot.log
 __pycache__/
 *.pyc
