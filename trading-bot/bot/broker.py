@@ -151,7 +151,10 @@ class CcxtBroker:
         eq = self.fetch_quote_balance_cached()
         for p in self.positions.values():
             px = price[p.symbol] if isinstance(price, dict) else price
-            eq += p.qty * px * (1 if p.direction > 0 else 0)
+            if p.direction > 0:
+                eq += p.qty * px
+            else:
+                eq += p.qty * (2 * p.entry - px)  # same short mark as PaperBroker
         return eq
 
     def fetch_quote_balance_cached(self) -> float:

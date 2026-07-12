@@ -1,0 +1,78 @@
+# ============================================================
+# MEXC FUTURES PAPER-TRADING PROFILE — real MEXC perpetual prices,
+# simulated fills, longs AND shorts. NO API keys needed. Run with:
+#
+#   python run_live.py --mode paper --config config.mexc-futures-paper.yaml --state state_mexc_futures.json
+#
+# Same strategy/risk as config.mexc-paper.yaml, with three changes:
+#   * symbols are USDT perpetuals (BTC/USDT:USDT form; FIL has no
+#     perp on MEXC and is dropped)
+#   * allow_shorts: true — the mirrored short setups trade too
+#   * fee_pct 0.02 — MEXC futures taker (verify, promos change)
+#
+# KNOW WHAT THIS DOES NOT MODEL: perpetual funding payments
+# (~0.01% per 8h, either direction) and liquidation mechanics.
+# Sizing stays cash-capped (1x, no leverage), so liquidation is
+# far away, but funding will move multi-week PnL. Paper only:
+# CcxtBroker is spot-only and refuses shorts, and MEXC has no
+# testnet, so --mode demo will not start on this profile.
+# ============================================================
+
+exchange:
+  exchange_id: mexc
+  testnet: true             # ignored for market data in paper mode; keeps
+                            # the demo-mode guard armed if anyone flips modes
+  symbols:
+    - BTC/USDT:USDT
+    - ETH/USDT:USDT
+    - SOL/USDT:USDT
+    - BNB/USDT:USDT
+    - XRP/USDT:USDT
+    - ADA/USDT:USDT
+    - DOGE/USDT:USDT
+    - AVAX/USDT:USDT
+    - LINK/USDT:USDT
+    - DOT/USDT:USDT
+    - LTC/USDT:USDT
+    - NEAR/USDT:USDT
+    - UNI/USDT:USDT
+    - ATOM/USDT:USDT
+    - TRX/USDT:USDT
+  timeframe: 4h
+
+risk:
+  allocated_budget: 100
+  risk_per_trade_pct: 1.0
+  max_total_risk_pct: 10
+  max_drawdown_pct: 10
+  daily_loss_pause_pct: 3
+  vol_target_atr_pct: 0.6
+  min_stop_cost_mult: 5
+  min_order_notional: 6
+  max_open_positions: 2
+  fee_pct: 0.02             # MEXC advertised futures taker
+  slippage_pct: 0.05
+
+strategy:
+  ema_fast: 21
+  ema_slow: 55
+  atr_period: 14
+  rsi_period: 14
+  swing_left: 3
+  swing_right: 3
+  structure_lookback: 120
+  zone_cluster_atr_mult: 0.5
+  zone_touch_atr_mult: 0.25
+  min_pattern_score: 0.60
+  rsi_long_max: 70
+  rsi_short_min: 30
+  stop_atr_buffer: 0.5
+  max_stop_atr_mult: 3.0
+  partial_take_r: 1.0
+  partial_take_fraction: 0.3
+  breakeven_at_r: 1.0
+  trail_atr_mult: 3.5
+  trail_tighten_after_r: null
+  target_r: null
+  allow_shorts: true
+  cooldown_bars: 3

@@ -124,6 +124,24 @@ proving the system works live with capped risk, not about income. If the
 demo (and later a small real run) stays green for months, the same
 percentages scale with the budget.
 
+## Futures paper profile (longs + shorts)
+
+`config.mexc-futures-paper.yaml` runs the same strategy on MEXC USDT
+perpetual prices with `allow_shorts: true`, so the mirrored short setups
+(downtrend + rally into the EMA + bearish reversal pattern) trade too:
+
+```bash
+python run_live.py --mode paper --config config.mexc-futures-paper.yaml --state state_mexc_futures.json
+```
+
+Why it exists: on the Nov 2025–Jul 2026 window, long-only lost ~4.5%
+while long+short made ~+4% (PF 1.17) — but that edge came from a falling
+market, and shorts will bleed in the next bull leg just as longs bled
+here. **Paper only, deliberately:** funding payments and liquidation
+mechanics are not modeled, and the live `CcxtBroker` is spot-only and
+refuses short orders. Let the paper journal earn trust before any real
+futures order flow is even discussed.
+
 ## Weekly review workflow
 
 The live loop journals every completed trade to `trades_demo.csv` /
