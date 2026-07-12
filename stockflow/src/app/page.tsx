@@ -15,6 +15,17 @@ type Dashboard = {
     open_work_orders: number;
     inventory_value: number;
   };
+  week: {
+    estimates_created: number;
+    deals_won: number;
+    conversion_rate: number | null;
+    revenue: number;
+    gross_profit: number;
+    units_shipped: number;
+    orders_created: number;
+    orders_fulfilled: number;
+    fulfillment_rate: number | null;
+  };
   low_stock: { id: string; sku: string; name: string; on_hand: number; reorder_point: number; uom: string }[];
   recent_events: { id: string; type: string; created_at: string }[];
   recent_orders: { id: string; number: string; status: string; customer_name: string; total: number }[];
@@ -55,6 +66,42 @@ export default function DashboardPage() {
             <div key={c.label}>{inner}</div>
           );
         })}
+      </div>
+
+      <div className="mt-8">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Last 7 days</h2>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
+          {[
+            { label: "Estimates created", value: data ? String(data.week.estimates_created) : "…" },
+            { label: "Deals won", value: data ? String(data.week.deals_won) : "…" },
+            {
+              label: "Conversion rate",
+              value: data ? (data.week.conversion_rate === null ? "—" : `${Math.round(data.week.conversion_rate * 100)}%`) : "…",
+              sub: data && data.week.estimates_created > 0 ? `${data.week.deals_won} of ${data.week.estimates_created} quotes` : "no estimates yet",
+            },
+            {
+              label: "Gross profit",
+              value: data ? money(data.week.gross_profit) : "…",
+              sub: data ? `on ${money(data.week.revenue)} shipped revenue` : undefined,
+              highlight: true,
+            },
+            { label: "Units shipped", value: data ? String(data.week.units_shipped) : "…" },
+            {
+              label: "Shipment fulfillment",
+              value: data ? (data.week.fulfillment_rate === null ? "—" : `${Math.round(data.week.fulfillment_rate * 100)}%`) : "…",
+              sub: data && data.week.orders_created > 0 ? `${data.week.orders_fulfilled} of ${data.week.orders_created} orders shipped in full` : "no orders this week",
+            },
+          ].map((c) => (
+            <div
+              key={c.label}
+              className={`rounded-xl border p-4 shadow-sm ${c.highlight ? "border-indigo-200 bg-indigo-50/50" : "border-slate-200 bg-white"}`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{c.label}</p>
+              <p className="mt-1.5 text-2xl font-bold tracking-tight">{c.value}</p>
+              {c.sub && <p className="mt-0.5 text-xs text-slate-400">{c.sub}</p>}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">

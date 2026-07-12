@@ -6,6 +6,11 @@ Every single thing the UI does goes through the public REST API (the UI is just 
 
 ## Features
 
+**Sales pipeline**
+- Estimates (quotes) with win/decline — winning one converts it to a sales order in one click
+- Invoices created from sales orders: printable/PDF-ready document, email sending (via Resend), mark paid, void
+- Dashboard "Last 7 days" metrics: estimates created, deals won, conversion rate, gross profit on shipped goods, units shipped, shipment fulfillment rate
+
 **Inventory operations**
 - Items catalog — inventory, non-inventory, and service types; SKU, barcode, category, unit of measure, cost/price, reorder points
 - Multi-location stock tracking (warehouses, storefronts, vans…)

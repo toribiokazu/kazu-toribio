@@ -152,6 +152,58 @@ CREATE TABLE IF NOT EXISTS work_orders (
   updated_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS estimates (
+  id TEXT PRIMARY KEY,
+  number TEXT NOT NULL UNIQUE,
+  customer_id TEXT NOT NULL REFERENCES customers(id),
+  location_id TEXT NOT NULL REFERENCES locations(id),
+  status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open','accepted','declined')),
+  sales_order_id TEXT NOT NULL DEFAULT '',
+  order_date TEXT NOT NULL,
+  expiry_date TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  decided_at TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS estimate_lines (
+  id TEXT PRIMARY KEY,
+  estimate_id TEXT NOT NULL REFERENCES estimates(id) ON DELETE CASCADE,
+  item_id TEXT NOT NULL REFERENCES items(id),
+  description TEXT NOT NULL DEFAULT '',
+  qty REAL NOT NULL,
+  unit_price REAL NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_est_lines ON estimate_lines(estimate_id);
+
+CREATE TABLE IF NOT EXISTS invoices (
+  id TEXT PRIMARY KEY,
+  number TEXT NOT NULL UNIQUE,
+  sales_order_id TEXT NOT NULL REFERENCES sales_orders(id),
+  customer_id TEXT NOT NULL REFERENCES customers(id),
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','sent','paid','void')),
+  issue_date TEXT NOT NULL,
+  due_date TEXT NOT NULL DEFAULT '',
+  email_to TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  sent_at TEXT NOT NULL DEFAULT '',
+  paid_at TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS invoice_lines (
+  id TEXT PRIMARY KEY,
+  invoice_id TEXT NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  item_id TEXT NOT NULL REFERENCES items(id),
+  sku TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  qty REAL NOT NULL,
+  unit_price REAL NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_inv_lines ON invoice_lines(invoice_id);
+
 CREATE TABLE IF NOT EXISTS api_keys (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,

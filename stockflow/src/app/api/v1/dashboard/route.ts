@@ -18,6 +18,46 @@ export const GET = route({ write: false }, () => {
         .get() as { n: number }
     ).n,
   };
+  // Rolling last-7-days sales metrics
+  const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+  const estimatesCreated = (
+    db.prepare("SELECT COUNT(*) AS n FROM estimates WHERE created_at >= ?").get(weekAgo) as { n: number }
+  ).n;
+  const dealsWon = (
+    db.prepare("SELECT COUNT(*) AS n FROM estimates WHERE status = 'accepted' AND decided_at >= ?").get(weekAgo) as {
+      n: number;
+    }
+  ).n;
+  const shipped = db
+    .prepare(
+      `SELECT COALESCE(SUM(-m.delta), 0) AS units,
+              COALESCE(SUM(-m.delta * COALESCE(sol.unit_price, i.price)), 0) AS revenue,
+              COALESCE(SUM(-m.delta * i.cost), 0) AS cogs
+       FROM stock_moves m
+       JOIN items i ON i.id = m.item_id
+       LEFT JOIN sales_order_lines sol ON sol.order_id = m.ref_id AND sol.item_id = m.item_id
+       WHERE m.reason = 'sale' AND m.created_at >= ?`
+    )
+    .get(weekAgo) as { units: number; revenue: number; cogs: number };
+  const weekOrders = db
+    .prepare(
+      `SELECT COUNT(*) AS total,
+              SUM(CASE WHEN status = 'fulfilled' THEN 1 ELSE 0 END) AS fulfilled
+       FROM sales_orders WHERE created_at >= ? AND status != 'canceled'`
+    )
+    .get(weekAgo) as { total: number; fulfilled: number | null };
+  const week = {
+    estimates_created: estimatesCreated,
+    deals_won: dealsWon,
+    conversion_rate: estimatesCreated > 0 ? dealsWon / estimatesCreated : null,
+    revenue: shipped.revenue,
+    gross_profit: shipped.revenue - shipped.cogs,
+    units_shipped: shipped.units,
+    orders_created: weekOrders.total,
+    orders_fulfilled: weekOrders.fulfilled ?? 0,
+    fulfillment_rate: weekOrders.total > 0 ? (weekOrders.fulfilled ?? 0) / weekOrders.total : null,
+  };
+
   const lowStock = db
     .prepare(
       `SELECT i.id, i.sku, i.name, i.reorder_point, i.uom, COALESCE(SUM(s.qty), 0) AS on_hand
@@ -38,5 +78,5 @@ export const GET = route({ write: false }, () => {
        ORDER BY o.created_at DESC LIMIT 8`
     )
     .all();
-  return json({ data: { stats, low_stock: lowStock, recent_events: recentEvents, recent_orders: recentOrders } });
+  return json({ data: { stats, week, low_stock: lowStock, recent_events: recentEvents, recent_orders: recentOrders } });
 });

@@ -17,6 +17,17 @@ Environment variables:
 | --- | --- |
 | `STOCKFLOW_PASSWORD` | Enables the password gate (share this with your client) |
 | `STOCKFLOW_DATA_DIR` | Where the SQLite file lives (the Docker image sets `/data`) |
+| `RESEND_API_KEY` | Enables invoice emailing via [Resend](https://resend.com) (free tier: 100 emails/day) |
+| `STOCKFLOW_FROM_EMAIL` | The From address for invoice emails (must be verified in Resend; `onboarding@resend.dev` works for testing) |
+| `STOCKFLOW_COMPANY_NAME` | Company name shown on invoices (default "StockFlow") |
+
+## Sending invoices by email
+
+Invoice emailing uses Resend because it needs no SMTP setup: create a free
+account at resend.com, add an API key, and set `RESEND_API_KEY` +
+`STOCKFLOW_FROM_EMAIL`. Until those are set, the Send button returns a clear
+"not configured" message — everything else (creating, printing, marking paid)
+works without it.
 
 ## Option 1 — Railway (~$5/mo, easiest)
 

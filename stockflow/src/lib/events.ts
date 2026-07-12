@@ -31,6 +31,16 @@ export const EVENT_TYPES = [
   "work_order.updated",
   "work_order.completed",
   "import.completed",
+  "estimate.created",
+  "estimate.updated",
+  "estimate.accepted",
+  "estimate.declined",
+  "estimate.deleted",
+  "invoice.created",
+  "invoice.updated",
+  "invoice.sent",
+  "invoice.paid",
+  "invoice.voided",
 ] as const;
 
 export type EventType = (typeof EVENT_TYPES)[number] | "webhook.test";

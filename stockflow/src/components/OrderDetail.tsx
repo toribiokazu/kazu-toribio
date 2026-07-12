@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, PackageCheck, XCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, PackageCheck, Receipt, XCircle } from "lucide-react";
 import { api, Badge, Button, money, PageHeader, Table, useToast } from "@/components/ui";
 import type { OrderKindCfg } from "./OrdersPage";
 
@@ -33,6 +34,20 @@ export function OrderDetail({ cfg, id }: { cfg: OrderKindCfg; id: string }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [busy, setBusy] = useState(false);
   const toast = useToast();
+  const router = useRouter();
+
+  const createInvoice = async () => {
+    try {
+      const r = await api<{ data: { id: string; number: string } }>("/invoices", {
+        method: "POST",
+        body: JSON.stringify({ sales_order_id: id }),
+      });
+      toast(`Created ${r.data.number}`);
+      router.push(`/invoices/${r.data.id}`);
+    } catch (err) {
+      toast((err as Error).message, "error");
+    }
+  };
 
   const load = useCallback(() => {
     api<{ data: Order }>(`/${cfg.path}/${id}`)
@@ -82,6 +97,11 @@ export function OrderDetail({ cfg, id }: { cfg: OrderKindCfg; id: string }) {
         subtitle={`${String(order[cfg.partyNameField])} · ${order.location_name} · ${order.order_date}`}
         actions={
           <>
+            {cfg.kind === "sales" && order.status !== "canceled" && (
+              <Button variant="secondary" onClick={createInvoice}>
+                <Receipt size={15} /> Create invoice
+              </Button>
+            )}
             {order.status === "open" && (
               <Button variant="secondary" onClick={cancel}>
                 <XCircle size={15} /> Cancel order
