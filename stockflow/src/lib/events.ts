@@ -30,6 +30,7 @@ export const EVENT_TYPES = [
   "work_order.created",
   "work_order.updated",
   "work_order.completed",
+  "import.completed",
 ] as const;
 
 export type EventType = (typeof EVENT_TYPES)[number] | "webhook.test";

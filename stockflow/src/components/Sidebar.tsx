@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Boxes,
   ClipboardList,
+  FileUp,
   Factory,
   Gauge,
   KeyRound,
@@ -39,6 +40,7 @@ const SECTIONS: { label: string; links: { href: string; label: string; icon: Rea
       { href: "/customers", label: "Customers", icon: Users },
       { href: "/vendors", label: "Vendors", icon: ClipboardList },
       { href: "/locations", label: "Locations", icon: MapPin },
+      { href: "/import", label: "Import Data", icon: FileUp },
     ],
   },
   {

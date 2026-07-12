@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // node:sqlite is a Node built-in; keep it out of the bundler.
-  serverExternalPackages: [],
+  // Self-contained server bundle for small Docker images (see Dockerfile).
+  output: "standalone",
 };
 
 export default nextConfig;

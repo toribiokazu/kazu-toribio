@@ -30,6 +30,7 @@ const ENDPOINTS: { method: string; path: string; desc: string }[] = [
   { method: "GET", path: "/api/v1/webhooks/:id/deliveries", desc: "Delivery log with response codes and bodies" },
   { method: "POST", path: "/api/v1/deliveries/:id/redeliver", desc: "Manually retry any delivery" },
   { method: "POST", path: "/api/v1/api-keys", desc: "Create API keys — { name, scope: 'full' | 'read' }" },
+  { method: "POST", path: "/api/v1/import", desc: "Bulk import — { type: items|customers|vendors, rows, location_id? }; skips existing records" },
 ];
 
 const METHOD_COLORS: Record<string, string> = {

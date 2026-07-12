@@ -16,6 +16,11 @@ Every single thing the UI does goes through the public REST API (the UI is just 
 - Reports: inventory valuation, reorder report, low-stock dashboard
 - Oversell protection: any operation that would drive stock negative is rejected atomically
 
+**Migration & sandboxing**
+- **Import Data** page: upload CSV exports from SOS Inventory (or anything else) for items, customers, and vendors — auto-matched columns, preview, opening stock quantities into a chosen location, duplicate-safe re-runs
+- **Password gate**: set `STOCKFLOW_PASSWORD` and the whole UI + API sits behind a login — safe to hand a sandbox URL to a client
+- Docker image + configs for Railway/Fly/Render/VPS — see `DEPLOY.md`
+
 **Developer platform**
 - REST API at `/api/v1` — JSON in/out, uniform `{ data }` / `{ error }` envelopes, pagination, search and filters on every list endpoint
 - API keys with `full` or `read`-only scope; SHA-256-hashed at rest, shown once, revocable
@@ -37,6 +42,8 @@ bun run seed
 ```
 
 Development mode: `bun run dev`.
+
+Hosting a sandbox for someone else? Set `STOCKFLOW_PASSWORD` to enable the login gate, and read `DEPLOY.md` for hosting options (Railway/Fly/VPS/free tiers) — the app needs a host with a persistent disk.
 
 The database is a zero-config embedded SQLite file at `data/stockflow.db` (set `STOCKFLOW_DATA_DIR` to relocate it). It is created automatically on first request — there is no migration step. Requires Node 22+ (uses the built-in `node:sqlite`).
 

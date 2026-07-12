@@ -8,8 +8,15 @@ const BASE = (process.env.STOCKFLOW_URL || "http://localhost:3000") + "/api/v1";
 async function call(method, path, body) {
   const res = await fetch(BASE + path, {
     method,
-    // Seeding runs against your own instance; the same-origin header mirrors the UI's access path.
-    headers: { "content-type": "application/json", "sec-fetch-site": "same-origin" },
+    headers: {
+      "content-type": "application/json",
+      // With STOCKFLOW_API_KEY set, authenticate like any integration.
+      // Otherwise mirror the UI's same-origin path (works only when the
+      // password gate is off — see DEPLOY.md).
+      ...(process.env.STOCKFLOW_API_KEY
+        ? { authorization: `Bearer ${process.env.STOCKFLOW_API_KEY}` }
+        : { "sec-fetch-site": "same-origin" }),
+    },
     body: body ? JSON.stringify(body) : undefined,
   });
   const json = await res.json();

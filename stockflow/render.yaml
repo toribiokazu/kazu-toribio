@@ -1,0 +1,15 @@
+# Render blueprint — persistent disks require a paid instance (Starter).
+services:
+  - type: web
+    name: stockflow
+    runtime: docker
+    plan: starter
+    envVars:
+      - key: STOCKFLOW_DATA_DIR
+        value: /data
+      - key: STOCKFLOW_PASSWORD
+        sync: false # set in the Render dashboard
+    disk:
+      name: stockflow-data
+      mountPath: /data
+      sizeGB: 1

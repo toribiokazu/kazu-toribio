@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { getDb } from "./db";
+import { gatePassword, hasValidSession } from "./session";
 import { ApiError, id, now } from "./util";
 
 export type Auth = { via: "api_key"; keyId: string; scope: "full" | "read" } | { via: "ui" };
@@ -42,7 +43,12 @@ export function authenticate(req: Request, write: boolean): Auth {
     return { via: "api_key", keyId: row.id, scope: row.scope };
   }
 
-  if (req.headers.get("sec-fetch-site") === "same-origin") return { via: "ui" };
+  if (req.headers.get("sec-fetch-site") === "same-origin") {
+    // When the password gate is enabled, browser requests must also carry
+    // a valid session cookie; without a gate the same-origin check stands alone.
+    if (!gatePassword() || hasValidSession(req.headers.get("cookie"))) return { via: "ui" };
+    throw new ApiError(401, "Session expired — reload the page and sign in again");
+  }
 
   throw new ApiError(401, "Missing API key. Send 'Authorization: Bearer <key>'.");
 }

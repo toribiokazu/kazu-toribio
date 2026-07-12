@@ -1,0 +1,27 @@
+# Fly.io config — deploy with:
+#   fly launch --copy-config --no-deploy
+#   fly volumes create stockflow_data --size 1
+#   fly secrets set STOCKFLOW_PASSWORD=your-sandbox-password
+#   fly deploy
+app = "stockflow-sandbox"
+primary_region = "iad"
+
+[build]
+
+[env]
+  STOCKFLOW_DATA_DIR = "/data"
+
+[[mounts]]
+  source = "stockflow_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
