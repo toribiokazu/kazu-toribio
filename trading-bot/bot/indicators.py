@@ -80,4 +80,7 @@ def add_indicators(df: pd.DataFrame, cfg) -> pd.DataFrame:
     out["swing_high"] = swings["swing_high"]
     out["swing_low"] = swings["swing_low"]
     out["swing_confirm_idx"] = swings["confirm_idx"]
+    n = getattr(cfg, "regime_sma_bars", None)
+    if n:
+        out["regime_sma"] = out["close"].rolling(n, min_periods=n).mean()
     return out

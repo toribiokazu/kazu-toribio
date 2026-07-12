@@ -75,4 +75,7 @@ strategy:
   trail_tighten_after_r: null
   target_r: null
   allow_shorts: true
+  regime_sma_bars: 180      # ~30 days of 4h bars: long only above the pair's
+                            # own 30d SMA, short only below. Whole 150-300
+                            # plateau tested profitable; 180 sits mid-plateau.
   cooldown_bars: 3

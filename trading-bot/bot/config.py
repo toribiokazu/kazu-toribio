@@ -41,6 +41,11 @@ class StrategyConfig:
     trail_atr_mult_tight: float = 2.0  # the tighter multiple used after that
     target_r: float | None = None  # optional runner take-profit in R
     allow_shorts: bool = False  # spot demo accounts are long-only
+    # regime gate: longs only while close is above the symbol's own N-bar
+    # SMA, shorts only while below it (None = off). Measured on MEXC perps
+    # (Nov 25-Jul 26): a plateau of 150-300 bars all beat no gate; it works
+    # by vetoing counter-trend entries (e.g. bear-market bounce longs).
+    regime_sma_bars: int | None = None
     cooldown_bars: int = 3  # bars to wait after closing a trade
 
 
@@ -120,6 +125,8 @@ class BotConfig:
                 raise ValueError("partial_take_r must be positive")
             if s.target_r is not None and s.target_r <= s.partial_take_r:
                 raise ValueError("target_r must be beyond partial_take_r")
+        if s.regime_sma_bars is not None and s.regime_sma_bars < 2:
+            raise ValueError("regime_sma_bars must be >= 2 (or null to disable)")
 
 
 def _apply(section_cls, data: dict):

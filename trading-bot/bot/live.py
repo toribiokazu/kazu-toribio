@@ -132,7 +132,10 @@ class LiveTrader:
     # ------------------------------------------------------------------ data
     def _fetch(self, symbol: str) -> pd.DataFrame:
         ex = self.cfg.exchange
-        need = self.cfg.strategy.structure_lookback + self.cfg.strategy.ema_slow + 50
+        scfg = self.cfg.strategy
+        need = (
+            scfg.structure_lookback + scfg.ema_slow + 50 + (scfg.regime_sma_bars or 0)
+        )
         # Paper mode always reads REAL market data — that's the point of
         # paper trading — and it keeps working on exchanges with no testnet
         # (e.g. MEXC). Only demo order flow goes to the sandbox.

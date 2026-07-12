@@ -49,11 +49,22 @@ class PriceActionStrategy:
             return None
 
         trend = structure.combined_trend(df, i, cfg.structure_lookback)
-        if trend == structure.UP:
+        if trend == structure.UP and self._regime_ok(df, i, +1):
             return self._long_setup(df, i, float(a))
-        if trend == structure.DOWN and cfg.allow_shorts:
+        if trend == structure.DOWN and cfg.allow_shorts and self._regime_ok(df, i, -1):
             return self._short_setup(df, i, float(a))
         return None
+
+    def _regime_ok(self, df: pd.DataFrame, i: int, direction: int) -> bool:
+        """Slow-trend gate: longs need close above the symbol's own N-bar SMA,
+        shorts below it. Vetoes counter-trend setups (bear-market bounces)."""
+        if self.cfg.regime_sma_bars is None:
+            return True
+        sma = df["regime_sma"].iat[i]
+        if pd.isna(sma):
+            return False  # not enough history yet to judge the regime
+        close = df["close"].iat[i]
+        return close > sma if direction > 0 else close < sma
 
     # ---------------------------------------------------------------- longs
     def _long_setup(self, df: pd.DataFrame, i: int, a: float) -> Signal | None:

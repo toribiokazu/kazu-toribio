@@ -134,13 +134,23 @@ perpetual prices with `allow_shorts: true`, so the mirrored short setups
 python run_live.py --mode paper --config config.mexc-futures-paper.yaml --state state_mexc_futures.json
 ```
 
-Why it exists: on the Nov 2025–Jul 2026 window, long-only lost ~4.5%
-while long+short made ~+4% (PF 1.17) — but that edge came from a falling
-market, and shorts will bleed in the next bull leg just as longs bled
-here. **Paper only, deliberately:** funding payments and liquidation
-mechanics are not modeled, and the live `CcxtBroker` is spot-only and
-refuses short orders. Let the paper journal earn trust before any real
-futures order flow is even discussed.
+It also enables `regime_sma_bars: 180` — a slow-trend gate that only
+allows longs while a pair trades above its own ~30-day SMA and shorts
+only below it. Direction follows each pair's larger tide; the fast
+EMA/structure filter then picks the entry within it. This gate is the
+single biggest measured improvement in the whole study: it vetoes
+counter-trend entries (bear-market bounce longs were the strategy's
+worst trade class), and every SMA length in the 150–300 bar plateau
+tested profitable, so it is not a tuned knob.
+
+Measured on Nov 2025–Jul 2026 perp history: long-only lost ~4.5%,
+long+short made ~+4% (PF 1.17), and long+short with the regime gate
+made **+10.2% (PF 1.48, max DD 8.3%)** — with BOTH sides positive.
+Still: most of that window was a falling market. **Paper only,
+deliberately:** funding payments and liquidation mechanics are not
+modeled, and the live `CcxtBroker` is spot-only and refuses short
+orders. Let the paper journal earn trust before any real futures order
+flow is even discussed.
 
 ### Analysis tooling behind those numbers
 
