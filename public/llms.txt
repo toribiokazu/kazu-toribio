@@ -13,7 +13,7 @@
 
 ## Selected projects
 
-- AI Customer Request Triage (n8n + Groq AI + Airtable + Slack)
+- Support Triage (n8n + Groq AI + Airtable + Slack)
 - AI Lead Routing Workflow (n8n + GoHighLevel + Groq AI): https://github.com/toribiokazu/ai-lead-routing-ghl
 - Xero → Asana Transaction Export (Make.com): https://github.com/toribiokazu/xero-asana-transaction-export-automation
 - Email Nurture System (Mailchimp + Airtable): https://github.com/toribiokazu/email-nurture-system
