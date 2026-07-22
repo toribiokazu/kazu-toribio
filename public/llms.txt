@@ -13,12 +13,14 @@
 
 ## Selected projects
 
+- Support Triage (n8n + Groq AI + Airtable + Slack)
 - AI Lead Routing Workflow (n8n + GoHighLevel + Groq AI): https://github.com/toribiokazu/ai-lead-routing-ghl
 - Xero → Asana Transaction Export (Make.com): https://github.com/toribiokazu/xero-asana-transaction-export-automation
 - Email Nurture System (Mailchimp + Airtable): https://github.com/toribiokazu/email-nurture-system
 - WordPress Product Site (WordPress + SEO + GoHighLevel)
 - CRM Migration & Cleanup (Zoho → GoHighLevel, 10,000+ contacts)
 - AI Content Pipeline (ChatGPT + n8n + Airtable + Slack + WordPress): https://github.com/toribiokazu/ai-content-pipeline
+- AdPilot (React + TypeScript, cross-platform ad campaign builder/optimizer): https://github.com/toribiokazu/adpilot
 
 ## Skills
 

@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://toribiokazu.vercel.app/projects/support-triage</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://toribiokazu.vercel.app/projects/ai-lead-routing-workflow</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -27,6 +32,11 @@
   </url>
   <url>
     <loc>https://toribiokazu.vercel.app/projects/crm-migration-cleanup</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://toribiokazu.vercel.app/projects/adpilot</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
