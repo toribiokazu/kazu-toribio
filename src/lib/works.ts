@@ -76,6 +76,17 @@ export const works: Work[] = [
     image: "/zoho-ghl.webp",
   },
   {
+    slug: "adpilot",
+    title: "AdPilot",
+    tag: "React · TypeScript · Ad Platform APIs",
+    desc: "A cross-platform ad campaign workspace that builds, validates, and optimizes campaigns across Meta, Google Ads, LinkedIn, TikTok, and X, plus a CSV report analyzer that scores real ad exports and explains why a campaign won or lost.",
+    problem: "Running ads across multiple platforms means juggling different character limits, CTA sets, and image ratios per network, then manually digging through each platform's own reporting to figure out where budget is actually working — there's no single place to build a campaign once and see what to do next across all of them.",
+    build: "Built a React/TypeScript app with a four-step campaign wizard (basics → platforms → audience & budget → creative) that launches one campaign across any mix of platforms, validating creative live against each platform's real character limits, truncation points, and image ratios. A rules-based optimization engine reads per-platform and per-variant performance and surfaces ranked suggestions — budget reallocation toward the highest-ROAS platform, creative-fatigue flags, CTR-floor warnings, landing-page mismatch alerts, A/B-test verdicts. A separate report analyzer ingests a raw CSV export from any of the five platforms, auto-detects the columns, and produces a 0–100 performance score against per-platform benchmarks with a funnel-localized diagnosis of whether the problem is the creative, the cost, the landing page, or the underlying economics.",
+    result: "One workspace replaces five separate ad dashboards for building and reading campaign performance, and the report analyzer turns a raw export into a scored, explained verdict instead of a spreadsheet someone has to interpret by hand. Publishing to the real platform APIs is the one seam left open — the app is built around a PlatformAdapter interface so wiring in Meta, Google, LinkedIn, TikTok, or X's actual marketing API is a drop-in implementation, not a rebuild.",
+    image: "/adpilot.webp",
+    url: "https://github.com/toribiokazu/adpilot",
+  },
+  {
     slug: "ai-content-pipeline",
     title: "AI Content Pipeline",
     tag: "ChatGPT · Make",

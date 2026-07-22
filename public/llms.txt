@@ -20,6 +20,7 @@
 - WordPress Product Site (WordPress + SEO + GoHighLevel)
 - CRM Migration & Cleanup (Zoho → GoHighLevel, 10,000+ contacts)
 - AI Content Pipeline (ChatGPT + n8n + Airtable + Slack + WordPress): https://github.com/toribiokazu/ai-content-pipeline
+- AdPilot (React + TypeScript, cross-platform ad campaign builder/optimizer): https://github.com/toribiokazu/adpilot
 
 ## Skills
 
