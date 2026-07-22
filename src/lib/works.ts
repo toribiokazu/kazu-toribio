@@ -12,6 +12,15 @@ export type Work = {
 
 export const works: Work[] = [
   {
+    slug: "ai-customer-request-triage",
+    title: "AI Customer Request Triage",
+    tag: "n8n · Groq AI · Airtable · Slack",
+    desc: "An n8n automation that reads incoming email and SMS support requests, classifies them into six categories with a confidence score, drafts a reply for human review, and flags refunds or low-confidence messages in Slack immediately.",
+    problem: "Customer support ran through one shared inbox where every message, billing question, login issue, or refund request, had to be read, sorted, and routed by hand. That works at low volume but breaks down as a business grows, leaving refunds unanswered and technical issues buried under general questions.",
+    build: "Built an n8n workflow that normalizes email and SMS messages into one common format, checks for duplicates, classifies the request into one of six categories using Groq (Llama 3.3 70B) with a confidence score, validates that the AI output is actually usable before trusting it, drafts a reply for a human to review, logs everything to Airtable, and pings Slack immediately for refunds, low-confidence results, or anything that needs a second look.",
+    result: "The AI assists but never decides, every draft is reviewed by a person before it reaches a customer, so the team gets a faster first response and a full record of every request, with the guarantee that a refund request never sits unanswered just because it landed in a busy inbox at the wrong time.",
+  },
+  {
     slug: "ai-lead-routing-workflow",
     title: "AI Lead Routing Workflow",
     tag: "n8n · GoHighLevel · Groq AI",
