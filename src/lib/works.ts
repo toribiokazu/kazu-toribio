@@ -20,6 +20,7 @@ export const works: Work[] = [
     build: "Built an n8n workflow that normalizes email and SMS messages into one common format, checks for duplicates, classifies the request into one of six categories using Groq (Llama 3.3 70B) with a confidence score, validates that the AI output is actually usable before trusting it, drafts a reply for a human to review, logs everything to Airtable, and pings Slack immediately for refunds, low-confidence results, or anything that needs a second look.",
     result: "The AI assists but never decides, every draft is reviewed by a person before it reaches a customer, so the team gets a faster first response and a full record of every request, with the guarantee that a refund request never sits unanswered just because it landed in a busy inbox at the wrong time.",
     image: "/support-triage.webp",
+    url: "https://github.com/toribiokazu/kazu-toribio/tree/main/support-triage",
   },
   {
     slug: "ai-lead-routing-workflow",
